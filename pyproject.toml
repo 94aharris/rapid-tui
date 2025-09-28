@@ -1,0 +1,25 @@
+[project]
+name = "rapid-tui"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Your Name",email = "you@example.com"}
+]
+readme = "README.md"
+requires-python = ">= 3.11, < 4.0"
+dependencies = [
+    "textual (>=6.1.0,<7.0.0)",
+    "pydantic (>=2.11.9,<3.0.0)"
+]
+
+[project.scripts]
+rapid-tui = "rapid_tui.app:main"
+
+[tool.poetry]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.2"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
