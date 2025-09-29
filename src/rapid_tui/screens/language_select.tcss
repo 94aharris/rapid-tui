@@ -1,0 +1,20 @@
+/* Language Selection Screen specific styles */
+LanguageSelectScreen {
+    align: center middle;
+}
+
+LanguageSelectScreen .language-container {
+    width: 60;
+    height: auto;
+    border: solid $primary;
+    padding: 2 4;
+    margin: 2;
+}
+
+LanguageSelectScreen RadioSet {
+    margin: 2 0;
+}
+
+LanguageSelectScreen RadioButton {
+    margin: 0 2;
+}

@@ -1,41 +1,146 @@
-#!/usr/bin/env python3
+"""Main RAPID TUI application."""
 
 from textual.app import App, ComposeResult
-from textual.containers import Center, Middle
-from textual.widgets import Header, Footer, Static
+from textual.binding import Binding
+from textual.screen import Screen
+from typing import Optional, List, Dict, Type
+from pathlib import Path
+import sys
+import logging
+
+from rapid_tui.models import Language, Assistant, InitializationConfig
+from rapid_tui.screens.language_select import LanguageSelectScreen
+from rapid_tui.screens.assistant_select import AssistantSelectScreen
+from rapid_tui.screens.confirmation import ConfirmationScreen
 
 
-class HelloWorldApp(App):
-    """A simple Hello World Textual application."""
+class RapidTUI(App):
+    """Main TUI application for RAPID framework initialization."""
 
-    CSS = """
-    .hello {
-        width: 100%;
-        height: 100%;
-        content-align: center middle;
-        text-style: bold;
-        color: cyan;
-    }
-    """
+    # Load CSS from external file
+    CSS_PATH = "styles.css"
 
     BINDINGS = [
-        ("q", "quit", "Quit"),
-        ("ctrl+c", "quit", "Quit"),
+        Binding("q", "quit", "Quit", priority=True),
+        Binding("escape", "back", "Back"),
+        Binding("ctrl+c", "quit", "Exit"),
     ]
 
-    def compose(self) -> ComposeResult:
-        """Compose the layout of the application."""
-        yield Header()
-        yield Footer()
-        with Center():
-            with Middle():
-                yield Static("Hello, World! 🌍\n\nWelcome to Rapid TUI!", classes="hello")
+    def __init__(self):
+        """Initialize the RAPID TUI application."""
+        super().__init__()
+        self.config = InitializationConfig()
+        self.screens: Dict[str, Type[Screen]] = {}
+        self._setup_logging()
+
+    def _setup_logging(self) -> None:
+        """Setup application logging."""
+        log_dir = Path.cwd() / ".rapid"
+        log_dir.mkdir(exist_ok=True)
+
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(log_dir / "rapid_tui.log"),
+                logging.StreamHandler()
+            ]
+        )
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("RAPID TUI started")
+
+    def on_mount(self) -> None:
+        """Initialize application on mount."""
+        # Validate environment
+        if not self._validate_environment():
+            self.exit(message="Environment validation failed")
+            return
+
+        # Start with language selection
+        self.push_screen(LanguageSelectScreen())
+
+    def _validate_environment(self) -> bool:
+        """Validate environment for running RAPID TUI."""
+        current_dir = Path.cwd()
+
+        # Check write permissions
+        test_file = current_dir / ".rapid_test"
+        try:
+            test_file.touch()
+            test_file.unlink()
+        except Exception as e:
+            self.logger.error(f"No write permission in current directory: {e}")
+            print(f"❌ Error: No write permission in current directory: {current_dir}")
+            return False
+
+        self.logger.info(f"Environment validated for: {current_dir}")
+        return True
+
+    def handle_language_selection(self, language: Language) -> None:
+        """
+        Handle language selection from language screen.
+
+        Args:
+            language: Selected programming language
+        """
+        self.config.language = language
+        self.logger.info(f"Language selected: {language.display_name}")
+
+        # Navigate to assistant selection
+        assistant_screen = AssistantSelectScreen(language)
+        self.push_screen(assistant_screen)
+
+    def handle_assistant_selection(self, assistants: List[Assistant]) -> None:
+        """
+        Handle assistant selection from assistant screen.
+
+        Args:
+            assistants: List of selected assistants
+        """
+        self.config.assistants = assistants
+        self.logger.info(f"Assistants selected: {[a.display_name for a in assistants]}")
+
+        # Navigate to confirmation screen
+        confirmation_screen = ConfirmationScreen(self.config)
+        self.push_screen(confirmation_screen)
+
+    def go_back(self) -> None:
+        """Navigate to the previous screen."""
+        if len(self.screen_stack) > 1:
+            self.pop_screen()
+            self.logger.info("Navigated back to previous screen")
+
+    def action_back(self) -> None:
+        """Handle back action."""
+        self.go_back()
+
+    def action_quit(self) -> None:
+        """Handle quit action."""
+        self.logger.info("Application quit by user")
+        self.exit()
+
+    def on_screen_suspend(self) -> None:
+        """Handle screen suspend event."""
+        self.logger.info("Screen suspended")
+
+    def on_screen_resume(self) -> None:
+        """Handle screen resume event."""
+        self.logger.info("Screen resumed")
 
 
 def main():
-    """Main entry point for the rapid-tui command."""
-    app = HelloWorldApp()
-    app.run()
+    """Entry point for rapid-tui command."""
+    try:
+        app = RapidTUI()
+        app.run()
+    except KeyboardInterrupt:
+        print("\n\nInterrupted by user")
+        sys.exit(0)
+    except Exception as e:
+        print(f"\n❌ Fatal error: {e}")
+        logging.error(f"Fatal error: {e}", exc_info=True)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

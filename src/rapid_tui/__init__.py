@@ -1,5 +1,6 @@
-"""Rapid TUI - A fast Terminal User Interface framework."""
+"""RAPID TUI - Terminal User Interface for RAPID Framework initialization."""
 
-from .app import HelloWorldApp, main
+from .app import RapidTUI, main
 
-__all__ = ["HelloWorldApp", "main"]
+__version__ = "0.1.0"
+__all__ = ["RapidTUI", "main"]

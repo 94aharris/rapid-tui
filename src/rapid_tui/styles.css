@@ -1,0 +1,242 @@
+/* Theme Variables - Dark Theme */
+$primary: #00d9ff;        /* Cyan - primary accent */
+$surface: #1e1e2e;        /* Dark surface background */
+$panel: #2a2a3e;          /* Panel/container background */
+$boost: #383850;          /* Boosted/highlighted background */
+$surface-light: #44475a;  /* Hover/focus background */
+$text: #f8f8f2;           /* Primary text color */
+$text-muted: #94a3b8;     /* Secondary/muted text */
+$success: #50fa7b;        /* Success/positive state */
+$warning: #f1fa8c;        /* Warning/caution state */
+$error: #ff5555;          /* Error/negative state */
+
+/* Main application styles */
+Screen {
+    background: $surface;
+}
+
+/* Base screen styles */
+.screen-title {
+    text-align: center;
+    text-style: bold;
+    color: $primary;
+    margin: 1 0;
+    padding: 1;
+}
+
+.content-container {
+    margin: 1 2;
+    padding: 1 2;
+}
+
+.error-message {
+    color: $error;
+    text-style: bold;
+    margin: 1 0;
+}
+
+.warning-message {
+    color: $warning;
+    margin: 1 0;
+}
+
+.info-message {
+    color: $text;
+    margin: 1 0;
+}
+
+.button-row {
+    align: center middle;
+    margin-top: 2;
+    height: 3;
+}
+
+Button {
+    margin: 0 1;
+    min-width: 16;
+}
+
+/* Language Selection Screen */
+LanguageSelectScreen {
+    align: center middle;
+}
+
+.language-container {
+    width: 60;
+    height: auto;
+    border: solid $primary;
+    padding: 2 4;
+    margin: 2;
+}
+
+.language-title {
+    text-align: center;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+.language-description {
+    margin: 1 0;
+    color: $text-muted;
+}
+
+RadioSet {
+    margin: 2 0;
+}
+
+RadioButton {
+    margin: 0 2;
+}
+
+.no-templates-warning {
+    color: $warning;
+    text-style: italic;
+    margin-left: 4;
+}
+
+/* Assistant Selection Screen */
+AssistantSelectScreen {
+    align: center middle;
+}
+
+.assistant-container {
+    width: 70;
+    height: auto;
+    border: solid $primary;
+    padding: 2 3;
+    margin: 2;
+    background: $panel;
+}
+
+.assistant-description {
+    margin: 1 0 2 0;
+    color: $text;
+    text-align: center;
+    text-style: bold;
+}
+
+.assistant-item {
+    padding: 1 1;
+    margin: 1 0;
+    border: tall $surface;
+    background: $boost;
+}
+
+.assistant-item:hover {
+    background: $surface-light;
+}
+
+.assistant-info {
+    color: $text-muted;
+    text-style: italic;
+    margin: 0 0 0 3;
+    padding: 0 0 0 1;
+}
+
+Checkbox {
+    margin: 0 0;
+    width: 100%;
+    color: $text;
+}
+
+Checkbox:focus {
+    background: $surface-light;
+}
+
+.rapid-note {
+    color: $success;
+    text-align: center;
+    margin: 2 0 1 0;
+    padding: 1;
+    background: $boost;
+    border: tall $success;
+}
+
+/* Confirmation Screen */
+ConfirmationScreen {
+    align: center middle;
+}
+
+.summary-container {
+    width: 80;
+    height: auto;
+    border: solid $primary;
+    padding: 2 4;
+    margin: 2;
+}
+
+.summary-title {
+    text-align: center;
+    text-style: bold underline;
+    margin-bottom: 1;
+}
+
+.summary-item {
+    margin: 1 2;
+}
+
+.summary-label {
+    text-style: bold;
+    color: $primary;
+}
+
+.progress-container {
+    width: 80;
+    margin: 2;
+    padding: 2;
+}
+
+ProgressBar {
+    margin: 1 0;
+}
+
+.progress-label {
+    text-align: center;
+    margin: 1 0;
+}
+
+.result-container {
+    width: 80;
+    height: 20;
+    border: solid $success;
+    padding: 1 2;
+    margin: 2;
+}
+
+.result-log {
+    height: 15;
+    border: solid #94a3b8;
+    margin: 1 0;
+}
+
+.files-table {
+    height: 10;
+    margin: 1 0;
+}
+
+/* Nested styles for better organization */
+.assistant-container {
+    /* Nested button styles */
+    Button {
+        margin-top: 1;
+        width: 100%;
+    }
+
+    /* Nested checkbox container */
+    .assistant-item {
+        &:focus-within {
+            border: solid $primary;
+        }
+    }
+}
+
+/* Dark/Light theme support */
+Screen:dark {
+    /* Already using dark theme colors by default */
+}
+
+Screen:light {
+    /* Light theme overrides (if needed in future) */
+    background: #f8f8f2;
+    color: #1e1e2e;
+}
