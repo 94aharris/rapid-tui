@@ -16,6 +16,8 @@ dependencies = [
 rapid-tui = "rapid_tui.app:main"
 
 [tool.poetry]
+packages = [{include = "rapid_tui", from = "src"}]
+include = ["templates/**/*"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.2"
