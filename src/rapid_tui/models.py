@@ -55,8 +55,10 @@ class AssistantConfig(BaseModel):
     base_dir: str
     agents_path: Optional[str] = None
     commands_path: str
+    instructions_file: Optional[str] = None  # NEW: Filename for instruction file (e.g., "CLAUDE.md")
     copy_agents: bool = True
     copy_commands: bool = True
+    copy_instructions: bool = False  # NEW: Whether to copy instruction files
 
     def get_agent_dir(self, project_root: Path) -> Optional[Path]:
         """Get full path to agent directory."""
@@ -67,6 +69,12 @@ class AssistantConfig(BaseModel):
     def get_commands_dir(self, project_root: Path) -> Path:
         """Get full path to commands directory."""
         return project_root / self.base_dir / self.commands_path
+
+    def get_instructions_file(self, project_root: Path) -> Optional[Path]:
+        """Get the full path to the instructions file."""
+        if not self.instructions_file:
+            return None
+        return Path(project_root) / self.base_dir / self.instructions_file
 
 
 class InitializationConfig(BaseModel):
