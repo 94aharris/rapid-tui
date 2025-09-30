@@ -39,8 +39,11 @@ from rapid_tui.cli.commands import init, list, config, status
 def main(
     ctx: typer.Context,
     version: Optional[bool] = typer.Option(
-        None, "--version", callback=version_callback, is_eager=True,
-        help="Show version and exit"
+        None,
+        "--version",
+        callback=version_callback,
+        is_eager=True,
+        help="Show version and exit",
     ),
     ui: bool = typer.Option(False, "--ui", hidden=True),  # Hidden but still functional
     verbose: bool = typer.Option(
@@ -52,9 +55,11 @@ def main(
 ):
     """
     RAPID Framework CLI - Initialize AI-driven development projects
-    
+
     Version: {version}
-    """.format(version=__version__)
+    """.format(
+        version=__version__
+    )
     ctx.ensure_object(dict)
     ctx.obj["ui"] = ui
     ctx.obj["verbose"] = verbose
