@@ -130,17 +130,30 @@ class RapidTUI(App):
 
 
 def main():
-    """Entry point for rapid-tui command."""
-    try:
-        app = RapidTUI()
-        app.run()
-    except KeyboardInterrupt:
-        print("\n\nInterrupted by user")
-        sys.exit(0)
-    except Exception as e:
-        print(f"\n❌ Fatal error: {e}")
-        logging.error(f"Fatal error: {e}", exc_info=True)
-        sys.exit(1)
+    """Universal entry point that delegates to CLI or TUI."""
+    import sys
+
+    # Check if --ui flag is present (hidden but still functional)
+    if "--ui" in sys.argv:
+        # Remove --ui from args if present
+        if "--ui" in sys.argv:
+            sys.argv.remove("--ui")
+
+        # Launch TUI mode
+        try:
+            app = RapidTUI()
+            app.run()
+        except KeyboardInterrupt:
+            print("\n\nInterrupted by user")
+            sys.exit(0)
+        except Exception as e:
+            print(f"\n❌ Fatal error: {e}")
+            logging.error(f"Fatal error: {e}", exc_info=True)
+            sys.exit(1)
+    else:
+        # Launch CLI mode (default)
+        from rapid_tui.cli.main import cli
+        cli()
 
 
 if __name__ == "__main__":

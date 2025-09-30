@@ -32,9 +32,9 @@ RAPID differentiates itself from specification-driven methodologies like GitHub'
 
 The framework addresses common development challenges including incomplete requirements gathering, insufficient codebase analysis, and lack of systematic planning by enforcing a disciplined workflow that captures context, validates understanding, and ensures alignment before implementation begins. This results in more predictable outcomes, reduced rework, and higher-quality code that integrates seamlessly with existing application architecture.
 
-## Installation and Setup
+## Quick Start
 
-First, clone this repository and install the rapid-tui into a virtual environment:
+### Installation
 
 ```bash
 git clone <repository-url>
@@ -42,33 +42,46 @@ cd rapid-tui
 poetry install
 ```
 
-### Initial Setup
+### Initialize Your Project
 
-Navigate to your project directory and run the TUI:
+Navigate to your project and run:
 
 ```bash
 cd /path/to/your/project
-rapid-tui
+
+# Quick setup with CLI
+rapid init --language python --assistant claude-code
+
+# Or interactive mode for guided setup
+rapid init -i
+
 ```
 
-The interface will guide you through:
-1. **Selecting your codebase type** (Angular, Python, C#, Generic, etc.)
-2. **Selecting your AI assistant** (Claude Code, GitHub Copilot, or .rapid only)
+This will:
 
-The TUI will then:
 - Copy framework-specific agents to `.rapid/agents/`
 - Copy RAPID command definitions to `.rapid/commands/`
-- Distribute copies to your AI assistant's configuration directories (`.claude/`, `.github/copilot/`, etc.)
+- Set up your AI assistant directories (`.claude/`, `.github/`, etc.)
 
-### Updating Workflows
-
-When your team updates RAPID workflows, context documents, or agent definitions in the `.rapid/` directory, run:
+### Available Commands
 
 ```bash
-rapid-tui update
+# Initialize project
+rapid init -l python -a claude-code    # Quick setup
+rapid init --interactive                # Guided setup
+
+# Check what's available
+rapid list languages                    # Show supported languages
+rapid list assistants                   # Show AI assistants
+
+# Check status
+rapid status                            # Verify installation
 ```
 
-This synchronizes changes from `.rapid/` to all configured AI assistant directories, ensuring consistency across your team's tooling.
+### Supported Options
+
+**Languages:** `angular`, `python`, `generic`, `see-sharp`
+**Assistants:** `claude-code`, `github-copilot`, `rapid-only`
 
 ## Init (Setup)
 

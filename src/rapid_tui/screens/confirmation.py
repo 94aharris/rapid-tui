@@ -57,9 +57,11 @@ class ConfirmationScreen(BaseScreen):
         for child in list(content.children):
             child.remove()
 
-        # Create summary container
+        # Create summary container and mount it first
         summary_container = Vertical(classes="summary-container")
+        content.mount(summary_container)
 
+        # Now add children to the mounted container
         summary_container.mount(
             Static("Initialization Summary", classes="summary-title")
         )
@@ -87,8 +89,6 @@ class ConfirmationScreen(BaseScreen):
             Static("Directory Structure Preview:", classes="summary-label")
         )
         summary_container.mount(Static(preview, classes="summary-item"))
-
-        content.mount(summary_container)
 
         # Add confirmation buttons
         button_row = Horizontal(
@@ -188,8 +188,9 @@ class ConfirmationScreen(BaseScreen):
         for child in list(content.children):
             child.remove()
 
-        # Create progress container
+        # Create progress container and mount it first
         progress_container = Vertical(classes="progress-container")
+        content.mount(progress_container)
 
         self.progress_label = Static(
             "Starting initialization...", classes="progress-label"
@@ -202,8 +203,6 @@ class ConfirmationScreen(BaseScreen):
         # Create log widget for detailed output
         self.log_widget = RichLog(classes="result-log", wrap=True, markup=True)
         progress_container.mount(self.log_widget)
-
-        content.mount(progress_container)
 
         # Start the initialization worker
         self.run_initialization()
@@ -254,8 +253,9 @@ class ConfirmationScreen(BaseScreen):
         for child in list(content.children):
             child.remove()
 
-        # Create result container
+        # Create result container and mount it first
         result_container = Vertical(classes="result-container")
+        content.mount(result_container)
 
         if self.result.success:
             result_container.mount(
@@ -307,7 +307,6 @@ class ConfirmationScreen(BaseScreen):
             classes="button-row",
         )
 
-        content.mount(result_container)
         content.mount(button_row)
 
     def on_progress_update(self, message: ProgressUpdate) -> None:

@@ -6,7 +6,7 @@ LanguageSelectScreen {
 LanguageSelectScreen .language-container {
     width: 60;
     height: auto;
-    border: solid $primary;
+    border: solid #00d9ff;
     padding: 2 4;
     margin: 2;
 }

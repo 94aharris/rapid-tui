@@ -1,25 +1,13 @@
-/* Theme Variables - Dark Theme */
-$primary: #00d9ff;        /* Cyan - primary accent */
-$surface: #1e1e2e;        /* Dark surface background */
-$panel: #2a2a3e;          /* Panel/container background */
-$boost: #383850;          /* Boosted/highlighted background */
-$surface-light: #44475a;  /* Hover/focus background */
-$text: #f8f8f2;           /* Primary text color */
-$text-muted: #94a3b8;     /* Secondary/muted text */
-$success: #50fa7b;        /* Success/positive state */
-$warning: #f1fa8c;        /* Warning/caution state */
-$error: #ff5555;          /* Error/negative state */
-
 /* Main application styles */
 Screen {
-    background: $surface;
+    background: #1e1e2e;
 }
 
 /* Base screen styles */
 .screen-title {
     text-align: center;
     text-style: bold;
-    color: $primary;
+    color: #00d9ff;
     margin: 1 0;
     padding: 1;
 }
@@ -30,18 +18,18 @@ Screen {
 }
 
 .error-message {
-    color: $error;
+    color: #ff5555;
     text-style: bold;
     margin: 1 0;
 }
 
 .warning-message {
-    color: $warning;
+    color: #f1fa8c;
     margin: 1 0;
 }
 
 .info-message {
-    color: $text;
+    color: #f8f8f2;
     margin: 1 0;
 }
 
@@ -64,7 +52,7 @@ LanguageSelectScreen {
 .language-container {
     width: 60;
     height: auto;
-    border: solid $primary;
+    border: solid #00d9ff;
     padding: 2 4;
     margin: 2;
 }
@@ -77,7 +65,7 @@ LanguageSelectScreen {
 
 .language-description {
     margin: 1 0;
-    color: $text-muted;
+    color: #94a3b8;
 }
 
 RadioSet {
@@ -89,7 +77,7 @@ RadioButton {
 }
 
 .no-templates-warning {
-    color: $warning;
+    color: #f1fa8c;
     text-style: italic;
     margin-left: 4;
 }
@@ -101,16 +89,17 @@ AssistantSelectScreen {
 
 .assistant-container {
     width: 70;
-    height: auto;
-    border: solid $primary;
+    max-height: 70%;
+    overflow-y: auto;
+    border: solid #00d9ff;
     padding: 2 3;
     margin: 2;
-    background: $panel;
+    background: #2a2a3e;
 }
 
 .assistant-description {
     margin: 1 0 2 0;
-    color: $text;
+    color: #f8f8f2;
     text-align: center;
     text-style: bold;
 }
@@ -118,16 +107,16 @@ AssistantSelectScreen {
 .assistant-item {
     padding: 1 1;
     margin: 1 0;
-    border: tall $surface;
-    background: $boost;
+    border: tall #1e1e2e;
+    background: #383850;
 }
 
 .assistant-item:hover {
-    background: $surface-light;
+    background: #44475a;
 }
 
 .assistant-info {
-    color: $text-muted;
+    color: #94a3b8;
     text-style: italic;
     margin: 0 0 0 3;
     padding: 0 0 0 1;
@@ -136,20 +125,20 @@ AssistantSelectScreen {
 Checkbox {
     margin: 0 0;
     width: 100%;
-    color: $text;
+    color: #f8f8f2;
 }
 
 Checkbox:focus {
-    background: $surface-light;
+    background: #44475a;
 }
 
 .rapid-note {
-    color: $success;
+    color: #50fa7b;
     text-align: center;
     margin: 2 0 1 0;
     padding: 1;
-    background: $boost;
-    border: tall $success;
+    background: #383850;
+    border: tall #50fa7b;
 }
 
 /* Confirmation Screen */
@@ -160,7 +149,7 @@ ConfirmationScreen {
 .summary-container {
     width: 80;
     height: auto;
-    border: solid $primary;
+    border: solid #00d9ff;
     padding: 2 4;
     margin: 2;
 }
@@ -177,7 +166,7 @@ ConfirmationScreen {
 
 .summary-label {
     text-style: bold;
-    color: $primary;
+    color: #00d9ff;
 }
 
 .progress-container {
@@ -198,7 +187,7 @@ ProgressBar {
 .result-container {
     width: 80;
     height: 20;
-    border: solid $success;
+    border: solid #50fa7b;
     padding: 1 2;
     margin: 2;
 }
@@ -212,31 +201,4 @@ ProgressBar {
 .files-table {
     height: 10;
     margin: 1 0;
-}
-
-/* Nested styles for better organization */
-.assistant-container {
-    /* Nested button styles */
-    Button {
-        margin-top: 1;
-        width: 100%;
-    }
-
-    /* Nested checkbox container */
-    .assistant-item {
-        &:focus-within {
-            border: solid $primary;
-        }
-    }
-}
-
-/* Dark/Light theme support */
-Screen:dark {
-    /* Already using dark theme colors by default */
-}
-
-Screen:light {
-    /* Light theme overrides (if needed in future) */
-    background: #f8f8f2;
-    color: #1e1e2e;
 }
