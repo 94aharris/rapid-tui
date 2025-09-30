@@ -1,5 +1,5 @@
 ---
-description: Based on the plan.md file generated via the /rapid-plan command. Check and make sure that everything is correct and ready for implementation.
+mode: agent
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST** consider it before proceeding with the prompt (if not empty).

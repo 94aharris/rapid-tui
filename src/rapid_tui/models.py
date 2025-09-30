@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field, field_validator
 
 class Language(str, Enum):
     """Supported programming languages/frameworks."""
+
     ANGULAR = "angular"
     PYTHON = "python"
     GENERIC = "generic"
@@ -20,7 +21,7 @@ class Language(str, Enum):
             self.ANGULAR: "Angular/TypeScript",
             self.PYTHON: "Python",
             self.GENERIC: "Generic/Other",
-            self.SEE_SHARP: "C# (.NET)"
+            self.SEE_SHARP: "C# (.NET)",
         }[self]
 
     @property
@@ -32,6 +33,7 @@ class Language(str, Enum):
 
 class Assistant(str, Enum):
     """Supported AI assistants."""
+
     CLAUDE_CODE = "claude_code"
     GITHUB_COPILOT = "github_copilot"
     RAPID_ONLY = "rapid_only"
@@ -42,12 +44,13 @@ class Assistant(str, Enum):
         return {
             self.CLAUDE_CODE: "Claude Code",
             self.GITHUB_COPILOT: "GitHub Copilot",
-            self.RAPID_ONLY: ".rapid only"
+            self.RAPID_ONLY: ".rapid only",
         }[self]
 
 
 class AssistantConfig(BaseModel):
     """Configuration for each assistant's file structure."""
+
     name: str
     base_dir: str
     agents_path: Optional[str] = None
@@ -68,11 +71,12 @@ class AssistantConfig(BaseModel):
 
 class InitializationConfig(BaseModel):
     """User selections for initialization."""
+
     language: Optional[Language] = None
     assistants: List[Assistant] = Field(default_factory=list)
     project_path: Path = Field(default_factory=Path.cwd)
 
-    @field_validator('assistants')
+    @field_validator("assistants")
     @classmethod
     def validate_assistants(cls, v: List[Assistant]) -> List[Assistant]:
         """Ensure at least one assistant is selected."""
@@ -83,7 +87,7 @@ class InitializationConfig(BaseModel):
             v.append(Assistant.RAPID_ONLY)
         return v
 
-    @field_validator('project_path')
+    @field_validator("project_path")
     @classmethod
     def validate_project_path(cls, v: Path) -> Path:
         """Validate project path exists and is a directory."""
@@ -96,6 +100,7 @@ class InitializationConfig(BaseModel):
 
 class CopyOperation(BaseModel):
     """Record of a file copy operation."""
+
     source: Path
     destination: Path
     operation_type: str  # "agent" or "command"
@@ -115,6 +120,7 @@ class CopyOperation(BaseModel):
 
 class InitializationResult(BaseModel):
     """Result of the initialization process."""
+
     success: bool
     operations: List[CopyOperation]
     total_files_copied: int = 0
@@ -132,11 +138,66 @@ class InitializationResult(BaseModel):
             "errors_count": len(self.errors),
             "warnings_count": len(self.warnings),
             "operations_by_type": {
-                "agent": len([op for op in self.operations if op.operation_type == "agent"]),
-                "command": len([op for op in self.operations if op.operation_type == "command"])
+                "agent": len(
+                    [op for op in self.operations if op.operation_type == "agent"]
+                ),
+                "command": len(
+                    [op for op in self.operations if op.operation_type == "command"]
+                ),
             },
             "operations_by_assistant": {
-                assistant.value: len([op for op in self.operations if op.assistant == assistant])
+                assistant.value: len(
+                    [op for op in self.operations if op.assistant == assistant]
+                )
                 for assistant in Assistant
-            }
+            },
+        }
+
+
+class FileOperation(BaseModel):
+    """Record of a file synchronization operation."""
+
+    source: Path
+    target: Path
+    operation: str  # "copy", "skip", "error"
+    reason: str
+    success: bool = True
+
+    @property
+    def relative_target(self) -> str:
+        """Get target path relative to project root."""
+        try:
+            cwd = Path.cwd()
+            return str(self.target.relative_to(cwd))
+        except ValueError:
+            return str(self.target)
+
+    @property
+    def relative_source(self) -> str:
+        """Get source path relative to project root."""
+        try:
+            cwd = Path.cwd()
+            return str(self.source.relative_to(cwd))
+        except ValueError:
+            return str(self.source)
+
+
+class UpdateResult(BaseModel):
+    """Result of update synchronization."""
+
+    success: bool
+    operations: List[FileOperation]
+    files_copied: int = 0
+    files_skipped: int = 0
+    errors: List[str] = Field(default_factory=list)
+
+    @property
+    def summary(self) -> Dict[str, Any]:
+        """Generate summary statistics."""
+        return {
+            "success": self.success,
+            "files_copied": self.files_copied,
+            "files_skipped": self.files_skipped,
+            "total_operations": len(self.operations),
+            "errors_count": len(self.errors),
         }

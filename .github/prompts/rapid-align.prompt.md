@@ -1,5 +1,5 @@
 ---
-description: Based on the researched information available and created by /research prompt. Starts an interactive session with the user to ask for any clarifying questions based on the research done for better planning alignment.
+mode: agent
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST** consider it before proceeding with the prompt (if not empty).

@@ -1,5 +1,5 @@
 ---
-description: Creates a new git workspace and creates helps the user to create a descriptive rapid research prompt to be passed to /rapid-research.
+mode: agent
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST** consider it before proceeding with the prompt (if not empty).

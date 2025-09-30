@@ -4,7 +4,60 @@
 
 ## TL/DR
 
-Structured agentic development with specialized agents and command-driven workflows.
+Structured age\*\*Supported Options
+
+**Languages:** `angular`, `python`, `generic`, `see-sharp`
+**Assistants:** `claude-code`, `github-copilot`, `rapid-only`
+
+## File Synchronization
+
+RAPID provides bidirectional synchronization between your central `.rapid/` directory (source of truth) and assistant-specific directories. This enables collaborative workflow development and consistent context across different AI tools.
+
+### Update from .rapid/ (Default Direction)
+
+```bash
+# Sync all changes from .rapid/ to assistant directories
+rapid update
+
+# Update only Claude Code files
+rapid update --agent claude
+
+# Update only GitHub Copilot files
+rapid update --agent copilot
+
+# Force update even if target files are newer
+rapid update --force
+```
+
+### Consolidate to .rapid/ (Reverse Direction)
+
+```bash
+# Consolidate all changes from assistant directories back to .rapid/
+rapid update --reverse
+
+# Consolidate only from Claude Code directory
+rapid update --reverse --agent claude
+
+# Consolidate only from GitHub Copilot directory
+rapid update --reverse --agent copilot
+
+# Force consolidation regardless of timestamps
+rapid update --reverse --force
+```
+
+### File Synchronization Behavior
+
+- **Default**: Only copies files where source is newer than target
+- **Force Mode**: Overwrites target files regardless of timestamps
+- **Dry Run**: Preview operations with `--dry-run` flag
+- **Verbose**: See detailed operations with `--verbose` flag
+
+### Typical Workflows
+
+1. **Team Context Updates**: Update `.rapid/` files, then `rapid update` to distribute
+2. **Individual Improvements**: Modify assistant files, then `rapid update --reverse` to share
+3. **Conflict Resolution**: Use `--force` when you need to override timestamp checks
+4. **Multi-Assistant Setup**: Sync specific agents when working with different AI tools development with specialized agents and command-driven workflows.
 
 ## Overview
 
@@ -28,7 +81,7 @@ RAPID differentiates itself from specification-driven methodologies like GitHub'
 
 **Intentional Context Compaction**: RAPID's emphasis on "frequent compaction loops" and systematic context management prevents information overload while maintaining comprehensive understanding throughout the development process.
 
-**Centralized Context Management**: RAPID TUI enables teams to maintain AI workflow artifacts in a single `.rapid/` directory, then synchronize them across different AI coding assistants (Claude Code, GitHub Copilot, etc.). Teams update context documents and agent definitions once, and the TUI distributes them to assistant-specific folders, keeping workflows consistent across the team regardless of which AI tool individual developers prefer.
+**Centralized Context Management**: RAPID TUI enables teams to maintain AI workflow artifacts in a single `.rapid/` directory, then synchronize them bidirectionally across different AI coding assistants (Claude Code, GitHub Copilot, etc.). Teams can update context documents and agent definitions once in `.rapid/` and distribute them to assistant-specific folders, or consolidate changes made in assistant directories back to `.rapid/` for team sharing. The `rapid update` command supports both directions, keeping workflows consistent across the team regardless of which AI tool individual developers prefer while enabling collaborative workflow improvements.
 
 The framework addresses common development challenges including incomplete requirements gathering, insufficient codebase analysis, and lack of systematic planning by enforcing a disciplined workflow that captures context, validates understanding, and ensures alignment before implementation begins. This results in more predictable outcomes, reduced rework, and higher-quality code that integrates seamlessly with existing application architecture.
 
@@ -69,6 +122,13 @@ This will:
 # Initialize project
 rapid init -l python -a claude-code    # Quick setup
 rapid init --interactive                # Guided setup
+
+# Synchronize files between .rapid/ and assistant directories
+rapid update                            # Update all assistants from .rapid/
+rapid update --agent claude             # Update only Claude files
+rapid update --reverse                  # Consolidate changes back to .rapid/
+rapid update --reverse --agent copilot  # Consolidate only Copilot changes
+rapid update --force                    # Force overwrite regardless of timestamps
 
 # Check what's available
 rapid list languages                    # Show supported languages

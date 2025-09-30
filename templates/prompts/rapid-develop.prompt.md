@@ -1,5 +1,5 @@
 ---
-description: Based on the plan.md utilizes the rapid-code-agent to implement the feature or bug remediation.
+mode: agent
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST** consider it before proceeding with the prompt (if not empty).

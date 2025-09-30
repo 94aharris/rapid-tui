@@ -166,7 +166,69 @@ RAPID looks for `.rapidrc.json` in the current directory or home directory:
 }
 ```
 
-### 4. Check Status (`status`)
+### 4. Update Files (`update`)
+
+Synchronize files bidirectionally between `.rapid/` and assistant directories.
+
+#### Basic Usage
+
+```bash
+# Update all assistants from .rapid/ (default direction)
+rapid update
+
+# Update specific assistant
+rapid update --agent claude
+rapid update --agent copilot
+
+# Consolidate changes from assistants back to .rapid/ (reverse direction)
+rapid update --reverse
+
+# Consolidate from specific assistant
+rapid update --reverse --agent claude
+
+# Force update regardless of timestamps
+rapid update --force
+
+# Dry run to preview operations
+rapid update --dry-run --verbose
+```
+
+#### Options
+
+- `--agent, -a` : Target specific agent (claude, copilot, all)
+- `--force, -f` : Force update even if target files are newer
+- `--reverse, -r` : Consolidate changes from assistant directories to .rapid/
+
+#### Examples
+
+```bash
+# Standard workflow: Update all assistants from .rapid/
+rapid update
+
+# Update only Claude Code files
+rapid update --agent claude
+
+# Consolidate improvements back to .rapid/ for team sharing
+rapid update --reverse
+
+# Force sync Claude files regardless of timestamps
+rapid update --agent claude --force
+
+# Preview what would be consolidated from all assistants
+rapid update --reverse --dry-run --verbose
+```
+
+#### Synchronization Behavior
+
+- **Default Direction**: `.rapid/` → Assistant directories (`.claude/`, `.github/`)
+- **Reverse Direction**: Assistant directories → `.rapid/`
+- **Timestamp Comparison**: Only copies if source is newer (unless `--force`)
+- **File Mapping**:
+  - `.rapid/agents/` ↔ `.claude/agents/`
+  - `.rapid/commands/` ↔ `.claude/commands/`
+  - `.rapid/prompts/` ↔ `.github/prompts/`
+
+### 5. Check Status (`status`)
 
 Check the initialization status of RAPID framework in your project.
 
@@ -254,7 +316,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install RAPID
         run: pip install rapid-tui
@@ -300,9 +362,53 @@ rapid init -i
 
 # Verify setup
 rapid status
+
+# Sync initial files to all assistants
+rapid update
 ```
 
-### 2. Batch Initialization
+### 2. Team Collaboration with File Synchronization
+
+```bash
+# Team lead updates context in .rapid/
+vim .rapid/agents/python-code-agent.md
+vim .rapid/commands/rapid-develop.md
+
+# Distribute updates to all team assistant configurations
+rapid update
+
+# Team member improves a prompt in their assistant directory
+vim .claude/commands/rapid-plan.md
+
+# Consolidate improvements back to .rapid/ for team sharing
+rapid update --reverse --agent claude
+
+# Other team members can now get the improvements
+rapid update
+```
+
+### 3. Multi-Assistant Development
+
+```bash
+# Developer using both Claude Code and GitHub Copilot
+rapid init -l python -a claude-code -a github-copilot
+
+# Update both assistants from central .rapid/
+rapid update
+
+# Work in Claude Code, make improvements
+vim .claude/agents/python-code-agent.md
+
+# Work in GitHub Copilot prompts
+vim .github/prompts/rapid-develop.prompt.md
+
+# Consolidate all improvements back to .rapid/
+rapid update --reverse
+
+# Now .rapid/ has the latest from both assistants
+```
+
+### 4. Batch Initialization
 
 ```bash
 # Initialize multiple projects
@@ -312,10 +418,13 @@ for project in project1 project2 project3; do
     --language python \
     --assistant claude-code \
     --force
+
+  # Sync files for each project
+  (cd "./$project" && rapid update)
 done
 ```
 
-### 3. Configuration Templates
+### 5. Configuration Templates
 
 Create a team configuration:
 
@@ -327,6 +436,27 @@ rapid config --global --set-assistant rapid-only
 
 # Team members can now use defaults
 rapid init  # Uses configured defaults
+rapid update # Sync initial files
+```
+
+### 6. File Synchronization Workflows
+
+```bash
+# Preview what would be updated
+rapid update --dry-run --verbose
+
+# Update only specific assistant
+rapid update --agent claude
+
+# Force update when you know you want to overwrite
+rapid update --force
+
+# Consolidate changes from specific assistant
+rapid update --reverse --agent copilot
+
+# Two-way sync workflow
+rapid update --reverse  # Get latest changes into .rapid/
+rapid update           # Distribute to all assistants
 ```
 
 ## Troubleshooting
@@ -394,6 +524,14 @@ rapid --ui
 rapid init -l <lang> -a <assistant>     # Basic init
 rapid init -i                            # Interactive
 rapid init --dry-run                     # Preview changes
+
+# Update/Sync Files
+rapid update                             # Update all assistants from .rapid/
+rapid update -a <agent>                  # Update specific assistant
+rapid update --reverse                   # Consolidate to .rapid/
+rapid update --reverse -a <agent>        # Consolidate from specific assistant
+rapid update --force                     # Force overwrite
+rapid update --dry-run                   # Preview sync operations
 
 # List
 rapid list languages                     # Show languages

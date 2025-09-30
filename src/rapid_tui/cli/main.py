@@ -32,7 +32,7 @@ def version_callback(value: bool):
 
 
 # Import commands to register them with the app
-from rapid_tui.cli.commands import init, list, config, status
+from rapid_tui.cli.commands import init, list, config, status, update
 
 
 @app.callback(invoke_without_command=True)

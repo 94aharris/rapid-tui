@@ -1,5 +1,5 @@
 ---
-description: Based on the researched information available and created by /research command creates a plan to be passed to the rapid-coding-agent.
+mode: agent
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST** consider it before proceeding with the prompt (if not empty).
