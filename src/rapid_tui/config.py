@@ -17,24 +17,30 @@ ASSISTANT_CONFIGS: Dict[Assistant, AssistantConfig] = {
         base_dir=".claude",
         agents_path="agents",
         commands_path="commands",
+        instructions_file="CLAUDE.md",  # NEW
         copy_agents=True,
         copy_commands=True,
+        copy_instructions=True,  # NEW
     ),
     Assistant.GITHUB_COPILOT: AssistantConfig(
         name="GitHub Copilot",
         base_dir=".github",
         agents_path=None,  # No agents for Copilot
         commands_path="prompts",  # Direct path, no subdirectory
+        instructions_file="copilot-instructions.md",  # NEW
         copy_agents=False,
         copy_commands=True,
+        copy_instructions=True,  # NEW
     ),
     Assistant.RAPID_ONLY: AssistantConfig(
         name=".rapid only",
         base_dir=".rapid",
         agents_path="agents",
         commands_path="commands",
+        instructions_file=None,  # NEW - no separate instruction file
         copy_agents=True,
         copy_commands=True,
+        copy_instructions=False,  # NEW
     ),
 }
 
@@ -53,6 +59,20 @@ def get_agents_template_dir() -> Path:
 def get_commands_template_dir() -> Path:
     """Get the commands template directory."""
     return get_templates_dir() / "commands"
+
+
+def get_prompts_template_dir() -> Path:
+    """Get the prompts template directory."""
+    return get_templates_dir() / "prompts"
+
+
+def get_instructions_template_dir() -> Path:
+    """Get the path to the instructions template directory.
+
+    Returns:
+        Path: The path to templates/instructions directory
+    """
+    return get_templates_dir() / "instructions"
 
 
 # UI Configuration
@@ -78,18 +98,22 @@ TEMPLATE_MAPPINGS = {
     Language.ANGULAR: {
         "agents": ["rapid-code-agent.md", "rapid-planning-agent.md"],
         "commands": [],  # Use all commands
+        "instructions": "angular.md",  # NEW
     },
     Language.PYTHON: {
         "agents": ["python-code-agent.md", "python-planning-agent.md"],
         "commands": [],  # Use all commands
+        "instructions": "python.md",  # NEW
     },
     Language.GENERIC: {
         "agents": ["rapid-code-agent.md", "rapid-planning-agent.md"],
         "commands": [],  # Use all commands
+        "instructions": "generic.md",  # NEW
     },
     Language.SEE_SHARP: {
         "agents": [],  # No templates available yet
         "commands": [],  # Use all commands
+        "instructions": "see-sharp.md",  # NEW
     },
 }
 

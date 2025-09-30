@@ -13,6 +13,7 @@ from rich import print as rprint
 
 from rapid_tui.models import Language, Assistant, InitializationConfig
 from rapid_tui.services.initialization import InitializationService
+from rapid_tui.config import resolve_agent_name, get_available_agent_names
 from rapid_tui.cli.main import app
 
 console = Console()
@@ -74,12 +75,12 @@ def init(
         # Validate assistants
         if assistants:
             for assistant in assistants:
-                try:
-                    selected_assistants.append(Assistant(assistant.replace("-", "_")))
-                except ValueError:
+                resolved = resolve_agent_name(assistant)
+                if resolved is None:
                     console.print(f"[red]Error: Invalid assistant '{assistant}'[/red]")
-                    console.print("Valid options: claude-code, github-copilot, rapid-only")
+                    console.print(f"Valid options: {', '.join(get_available_agent_names())}")
                     raise typer.Exit(1)
+                selected_assistants.append(resolved)
         else:
             selected_assistants = _prompt_for_assistants()
 
@@ -156,26 +157,33 @@ def _interactive_selection():
 
     # Assistant selection
     assistant_table = Table(title="Available AI Assistants")
-    assistant_table.add_column("Code", style="cyan")
+    assistant_table.add_column("CLI Alias", style="cyan")
     assistant_table.add_column("Assistant", style="green")
 
-    for asst in Assistant:
-        assistant_table.add_row(asst.value.replace("_", "-"), asst.display_name)
+    # Show aliases from AGENT_ALIASES (claude, copilot, all)
+    from rapid_tui.config import AGENT_ALIASES
+
+    for alias, assistant in AGENT_ALIASES.items():
+        if alias == "all":
+            continue  # Skip "all" in init
+        display_name = assistant.display_name if assistant else "All"
+        assistant_table.add_row(alias, display_name)
 
     console.print(assistant_table)
 
     console.print("\n[dim]You can select multiple assistants (space-separated)[/dim]")
     assistant_choices = Prompt.ask(
         "Select assistants",
-        default="claude-code rapid-only"
+        default="claude"
     )
 
     selected_assistants = []
     for choice in assistant_choices.split():
-        try:
-            selected_assistants.append(Assistant(choice.replace("-", "_")))
-        except ValueError:
+        resolved = resolve_agent_name(choice)
+        if resolved is None:
             console.print(f"[yellow]Warning: Invalid assistant '{choice}' ignored[/yellow]")
+        else:
+            selected_assistants.append(resolved)
 
     return selected_language, selected_assistants
 
@@ -194,18 +202,19 @@ def _prompt_for_language():
 def _prompt_for_assistants():
     """Prompt for assistant selection."""
     console.print("\n[yellow]No assistants specified[/yellow]")
-    console.print("[dim]Available: claude-code, github-copilot, rapid-only[/dim]")
+    console.print(f"[dim]Available: {', '.join(get_available_agent_names())}[/dim]")
     assistant_choices = Prompt.ask(
         "Select assistants (space-separated)",
-        default="claude-code rapid-only"
+        default="claude"
     )
 
     selected = []
     for choice in assistant_choices.split():
-        try:
-            selected.append(Assistant(choice.replace("-", "_")))
-        except ValueError:
+        resolved = resolve_agent_name(choice)
+        if resolved is None:
             console.print(f"[yellow]Warning: Invalid assistant '{choice}' ignored[/yellow]")
+        else:
+            selected.append(resolved)
 
     return selected
 

@@ -148,6 +148,11 @@ class TemplateManager:
             command_ops = self._copy_commands(config, assistant)
             operations.extend(command_ops)
 
+        # Copy instructions if applicable
+        if config.copy_instructions:
+            instruction_ops = self._copy_instructions(config, language, assistant)
+            operations.extend(instruction_ops)
+
         return operations
 
     def _copy_agents(
@@ -189,16 +194,39 @@ class TemplateManager:
         config: AssistantConfig,
         assistant: Assistant
     ) -> List[CopyOperation]:
-        """Copy command templates to assistant directory."""
+        """Copy command templates to assistant directory.
+
+        For GitHub Copilot, copies from templates/prompts to both .rapid/prompts and .github/prompts.
+        For other assistants, copies from templates/commands to .rapid/commands and their respective directories.
+        """
         operations = []
 
-        # Create target directory
+        # Determine source directory based on assistant
+        if assistant == Assistant.GITHUB_COPILOT:
+            from rapid_tui.config import get_prompts_template_dir
+            source_dir = get_prompts_template_dir()
+            rapid_subdir = "prompts"
+        else:
+            source_dir = get_commands_template_dir()
+            rapid_subdir = "commands"
+
+        command_files = list(source_dir.glob("*.md"))
+
+        # Copy to .rapid/{commands|prompts} first
+        rapid_target_dir = self.project_root / ".rapid" / rapid_subdir
+        self._ensure_directory(rapid_target_dir)
+
+        for source_file in command_files:
+            # Copy to .rapid directory
+            rapid_destination = rapid_target_dir / source_file.name
+            operation = self._copy_file(
+                source_file, rapid_destination, "command", assistant
+            )
+            operations.append(operation)
+
+        # Copy to assistant directory
         target_dir = config.get_commands_dir(self.project_root)
         self._ensure_directory(target_dir)
-
-        # Copy all command files
-        source_dir = get_commands_template_dir()
-        command_files = list(source_dir.glob("*.md"))
 
         for source_file in command_files:
             destination = target_dir / source_file.name
@@ -207,6 +235,89 @@ class TemplateManager:
                 source_file, destination, "command", assistant
             )
             operations.append(operation)
+
+        return operations
+
+    def _copy_instructions(
+        self,
+        config: AssistantConfig,
+        language: Language,
+        assistant: Assistant,
+    ) -> List[CopyOperation]:
+        """Copy instruction template to .rapid/instructions/ and assistant directory.
+
+        Args:
+            config: Assistant configuration
+            language: Selected language
+            assistant: Target assistant
+
+        Returns:
+            List of copy operations performed
+        """
+        operations = []
+
+        # Skip if assistant doesn't support instructions
+        if not config.copy_instructions or not config.instructions_file:
+            self.logger.debug(
+                f"Skipping instruction copy for {assistant.value} "
+                "(copy_instructions=False or no instructions_file configured)"
+            )
+            return operations
+
+        # Get instruction template filename from TEMPLATE_MAPPINGS
+        from rapid_tui.config import get_language_templates
+
+        templates = get_language_templates(language)
+        instruction_filename = templates.get("instructions")
+
+        if not instruction_filename:
+            self.logger.warning(
+                f"No instruction template defined for language {language.value}"
+            )
+            return operations
+
+        # Get template source path
+        from rapid_tui.config import get_instructions_template_dir
+
+        template_source = get_instructions_template_dir() / instruction_filename
+
+        if not template_source.exists():
+            self.logger.error(f"Instruction template not found: {template_source}")
+            return operations
+
+        # First, copy to .rapid/instructions/{language}.md
+        rapid_instructions_dir = self.project_root / ".rapid" / "instructions"
+        rapid_dest = rapid_instructions_dir / instruction_filename
+
+        if not rapid_dest.exists() or self.dry_run:
+            op = self._copy_file(
+                source=template_source,
+                destination=rapid_dest,
+                operation_type="instruction",
+                assistant=assistant,
+            )
+            operations.append(op)
+            self.logger.info(
+                f"Copied instruction template to .rapid/instructions/{instruction_filename}"
+            )
+        else:
+            self.logger.debug(
+                f"Instruction file already exists in .rapid/instructions/: {instruction_filename}"
+            )
+
+        # Second, copy to assistant directory (e.g., .claude/CLAUDE.md)
+        assistant_dest = self.project_root / config.base_dir / config.instructions_file
+
+        op = self._copy_file(
+            source=template_source,
+            destination=assistant_dest,
+            operation_type="instruction",
+            assistant=assistant,
+        )
+        operations.append(op)
+        self.logger.info(
+            f"Copied instruction template to {config.base_dir}/{config.instructions_file}"
+        )
 
         return operations
 
@@ -287,6 +398,8 @@ class TemplateManager:
         self._ensure_directory(rapid_dir)
         self._ensure_directory(rapid_dir / "agents")
         self._ensure_directory(rapid_dir / "commands")
+        self._ensure_directory(rapid_dir / "prompts")
+        self._ensure_directory(rapid_dir / "instructions")
 
     def _rollback(self) -> None:
         """Rollback operations on failure."""
