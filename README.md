@@ -2,12 +2,16 @@
 
 ![simple_logo](imgs/rapid_transparent.png)
 
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/94aharris/rapid-tui)
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 ## TL/DR
 
-Structured age\*\*Supported Options
+Structured AI-driven development framework with specialized agents and command-driven workflows.
 
 **Languages:** `angular`, `python`, `generic`, `see-sharp`
-**Assistants:** `claude-code`, `github-copilot`, `rapid-only`
+**Assistants:** `claude` (claude-code), `copilot` (github-copilot), `rapid-only`
 
 ## File Synchronization
 
@@ -52,6 +56,13 @@ rapid update --reverse --force
 - **Dry Run**: Preview operations with `--dry-run` flag
 - **Verbose**: See detailed operations with `--verbose` flag
 
+### What Gets Synchronized
+
+- **Instructions**: Language-specific coding guidelines (`.rapid/instructions/` ↔ assistant directories)
+- **Agents**: Framework-specific AI agents (`.rapid/agents/` ↔ assistant directories)
+- **Commands**: RAPID workflow slash commands (`.rapid/commands/` ↔ assistant directories)
+- **Prompts**: Specialized prompt templates (`.rapid/prompts/` ↔ assistant directories)
+
 ### Typical Workflows
 
 1. **Team Context Updates**: Update `.rapid/` files, then `rapid update` to distribute
@@ -89,10 +100,22 @@ The framework addresses common development challenges including incomplete requi
 
 ### Installation
 
+#### From Source
+
 ```bash
-git clone <repository-url>
+git clone https://github.com/anthropics/rapid-tui.git
 cd rapid-tui
 poetry install
+```
+
+#### Using Poetry
+
+```bash
+# Add to your development dependencies
+poetry add --group dev rapid-tui
+
+# Or install globally
+pipx install rapid-tui
 ```
 
 ### Initialize Your Project
@@ -103,29 +126,39 @@ Navigate to your project and run:
 cd /path/to/your/project
 
 # Quick setup with CLI
-rapid init --language python --assistant claude-code
+rapid init --language python --assistant claude
+
+# Multiple assistants
+rapid init --language python --assistant claude --assistant copilot
 
 # Or interactive mode for guided setup
-rapid init -i
+rapid init --interactive
 
 ```
 
 This will:
 
+- Create `.rapid/` directory structure for centralized context management
+- Copy language-specific instruction templates to `.rapid/instructions/`
 - Copy framework-specific agents to `.rapid/agents/`
 - Copy RAPID command definitions to `.rapid/commands/`
+- Copy prompt templates to `.rapid/prompts/`
 - Set up your AI assistant directories (`.claude/`, `.github/`, etc.)
+- Synchronize all templates to assistant-specific folders
 
 ### Available Commands
 
 ```bash
 # Initialize project
-rapid init -l python -a claude-code    # Quick setup
+rapid init -l python -a claude         # Quick setup
+rapid init -l python -a claude -a copilot  # Multiple assistants
 rapid init --interactive                # Guided setup
+rapid init --force                      # Overwrite existing files
 
 # Synchronize files between .rapid/ and assistant directories
 rapid update                            # Update all assistants from .rapid/
 rapid update --agent claude             # Update only Claude files
+rapid update --agent all                # Update all configured agents
 rapid update --reverse                  # Consolidate changes back to .rapid/
 rapid update --reverse --agent copilot  # Consolidate only Copilot changes
 rapid update --force                    # Force overwrite regardless of timestamps
@@ -133,20 +166,124 @@ rapid update --force                    # Force overwrite regardless of timestam
 # Check what's available
 rapid list languages                    # Show supported languages
 rapid list assistants                   # Show AI assistants
+rapid list templates                    # Show available templates
 
-# Check status
+# Check status and configuration
 rapid status                            # Verify installation
+rapid config                            # Manage configuration
+
+# Get help
+rapid --help                            # Main help
+rapid init --help                       # Command-specific help
 ```
 
 ### Supported Options
 
 **Languages:** `angular`, `python`, `generic`, `see-sharp`
-**Assistants:** `claude-code`, `github-copilot`, `rapid-only`
+**Assistants:** `claude` (claude-code), `copilot` (github-copilot), `rapid-only`
 
-## Init (Setup)
+## Development and Testing
+
+### Running Tests
+
+RAPID TUI includes a comprehensive test suite using pytest:
 
 ```bash
-/rapid-init
+# Run all tests
+poetry run pytest
+
+# Run with coverage
+poetry run pytest --cov=rapid_tui --cov-report=html
+
+# Run specific test file
+poetry run pytest tests/test_cli_main.py
+
+# Run tests in verbose mode
+poetry run pytest -v
+
+# Run tests and show stdout
+poetry run pytest -s
+```
+
+### Test Structure
+
+- `tests/test_cli_main.py` - CLI command tests
+- `tests/test_config.py` - Configuration management tests
+- `tests/test_services_initialization.py` - Initialization service tests
+- `tests/test_services_update.py` - Update/sync service tests
+- `tests/test_models.py` - Data model tests
+- `tests/test_helpers.py` - Utility function tests
+
+### Code Quality
+
+```bash
+# Format code with black
+poetry run black .
+
+# Lint with ruff
+poetry run ruff check .
+
+# Type checking with mypy
+poetry run mypy src/rapid_tui
+```
+
+## Template Structure
+
+After initialization, RAPID creates a structured template directory in `.rapid/` that serves as the central source of truth for all AI assistant configurations:
+
+```
+.rapid/
+├── instructions/           # Language-specific development guidelines
+│   ├── python.md          # Python coding standards and patterns
+│   ├── angular.md         # Angular component and service patterns
+│   ├── generic.md         # General development guidelines
+│   └── see-sharp.md       # C# conventions and patterns
+├── agents/                # Framework-specific AI agents
+│   ├── python/
+│   │   ├── python-planning-agent.md
+│   │   └── python-code-agent.md
+│   ├── angular/
+│   │   ├── rapid-planning-agent.md
+│   │   └── rapid-code-agent.md
+│   └── generic/
+│       ├── rapid-planning-agent.md
+│       └── rapid-code-agent.md
+├── commands/              # RAPID workflow slash commands
+│   ├── rapid-init.md      # Project initialization command
+│   ├── rapid-research.md  # Codebase research command
+│   ├── rapid-align.md     # Requirements alignment command
+│   ├── rapid-plan.md      # Technical planning command
+│   ├── rapid-inspect.md   # Plan review command
+│   └── rapid-develop.md   # Implementation command
+└── prompts/               # Specialized prompt templates
+    ├── rapid-init.prompt.md
+    ├── rapid-research.prompt.md
+    ├── rapid-align.prompt.md
+    ├── rapid-plan.prompt.md
+    ├── rapid-inspect.prompt.md
+    └── rapid-develop.prompt.md
+```
+
+## AI Assistant Integration
+
+RAPID templates are synchronized to assistant-specific directories:
+
+- **Claude Code**: Files copied to `.claude/` directory
+- **GitHub Copilot**: Files copied to `.github/` directory
+- **All Assistants**: Core RAPID commands available as slash commands
+
+The `rapid update` command keeps these synchronized bidirectionally.
+
+---
+
+# RAPID Workflow: AI Assistant Slash Commands
+
+The following commands are installed in your AI assistants after running `rapid init`. These are **slash commands** used within your AI coding assistant, not CLI commands.
+
+## /rapid-init (Setup)
+
+```bash
+/rapid-init [feature description]
 ```
 
 ### Overview:
@@ -162,10 +299,10 @@ The Init phase establishes the development workspace and creates a comprehensive
 5. Validate the formulated prompt with the user to ensure accuracy and completeness
 6. Store the validated prompt in `.rapid/branch-name/research-prompt.md` for use by subsequent phases
 
-## Research: Codebase Context Gathering
+## /rapid-research: Codebase Context Gathering
 
 ```bash
-rapid-research
+/rapid-research
 ```
 
 ### Overview:
@@ -181,7 +318,7 @@ The Research phase conducts comprehensive codebase analysis to gather relevant c
 5. Identify any gaps or ambiguities that require clarification and add them to the CLARIFYING QUESTIONS section at the bottom of the research file
 6. Report completion with the research file path and confirm readiness to proceed to the `/rapid-align` stage
 
-## Align: Interactive Clarification Session
+## /rapid-align: Interactive Clarification Session
 
 ```bash
 /rapid-align
@@ -200,7 +337,7 @@ The Align phase creates an interactive feedback loop with the user to resolve an
 5. Confirm with the user that all questions have been addressed and requirements are clearly understood
 6. Validate that the task is ready to proceed to the `/rapid-plan` stage with complete and unambiguous requirements
 
-## Plan: Technical Specification Generation
+## /rapid-plan: Technical Specification Generation
 
 ```bash
 /rapid-plan
@@ -219,7 +356,7 @@ The Plan phase leverages a specialized planning agent to transform the clarified
 5. Store the comprehensive implementation plan in `.rapid/branch-name/plan.md`
 6. Confirm completion of the planning phase and validate readiness to proceed to the `/rapid-inspect` stage
 
-## Inspect: Plan Validation and Review
+## /rapid-inspect: Plan Validation and Review
 
 ```bash
 /rapid-inspect
@@ -238,7 +375,7 @@ The Inspect phase provides a final quality assurance checkpoint before implement
 5. Update `.rapid/branch-name/plan.md` with any recommended changes or refinements as necessary
 6. Confirm with the user that the plan is approved and ready for implementation, then validate readiness to proceed to the `/rapid-develop` stage
 
-## Develop: Code Implementation
+## /rapid-develop: Code Implementation
 
 ```bash
 /rapid-develop
@@ -268,7 +405,7 @@ Here's a full example of using RAPID with Claude Code to implement a new feature
 cd /path/to/your/project
 
 # Initialize RAPID for a Python project with Claude Code
-rapid init --language python --assistant claude-code
+rapid init --language python --assistant claude
 
 # Verify initialization
 rapid status
