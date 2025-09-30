@@ -4,6 +4,7 @@ import typer
 from rich.console import Console
 
 from rapid_tui import __version__
+from rapid_tui.cli import commands  # noqa: F401, needed to add commands to cli
 from rapid_tui.utils.logo import display_welcome_banner
 
 app = typer.Typer(
@@ -20,9 +21,6 @@ def version_callback(value: bool):
     if value:
         console.print(f"RAPID TUI v{__version__}")
         raise typer.Exit()
-
-
-# Import commands to register them with the app
 
 
 @app.callback(invoke_without_command=True)
