@@ -39,8 +39,13 @@ class TemplateManager:
         """Configure logging for file operations."""
         logger = logging.getLogger(__name__)
         if not logger.handlers:
+            # Ensure .rapid directory exists before creating log file
+            rapid_dir = self.project_root / ".rapid"
+            if not rapid_dir.exists():
+                rapid_dir.mkdir(parents=True, exist_ok=True)
+
             handler = logging.FileHandler(
-                self.project_root / ".rapid" / "initialization.log",
+                rapid_dir / "initialization.log",
                 mode='a'
             )
             formatter = logging.Formatter(
