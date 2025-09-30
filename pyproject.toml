@@ -23,6 +23,22 @@ include = ["templates/**/*"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.2"
+pytest-cov = "^6.0.0"
+pytest-mock = "^3.12.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--verbose",
+    "--tb=short",
+    "--cov=src/rapid_tui",
+    "--cov-report=term-missing",
+    "--cov-report=html"
+]
+minversion = "6.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
