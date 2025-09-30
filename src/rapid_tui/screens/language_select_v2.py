@@ -1,13 +1,12 @@
 """Simplified language selection screen using custom widgets."""
 
-from textual.app import ComposeResult
-from textual.widgets import RadioSet, RadioButton
 from textual import on
-from typing import Optional
+from textual.app import ComposeResult
+from textual.widgets import Button, RadioButton, RadioSet
 
-from rapid_tui.screens.base import BaseScreen
 from rapid_tui.models import Language
-from rapid_tui.widgets import Card, StyledButton, InfoPanel, FormGroup
+from rapid_tui.screens.base import BaseScreen, Container
+from rapid_tui.widgets import Card, FormGroup, InfoPanel, StyledButton
 
 
 class LanguageSelectScreenV2(BaseScreen):
@@ -16,7 +15,7 @@ class LanguageSelectScreenV2(BaseScreen):
     def __init__(self):
         """Initialize language selection screen."""
         super().__init__(name="language_select", title="Select Programming Language")
-        self.selected_language: Optional[Language] = None
+        self.selected_language: Language | None = None
 
     def compose(self) -> ComposeResult:
         """Compose the screen using custom widgets."""
@@ -62,14 +61,18 @@ class LanguageSelectScreenV2(BaseScreen):
         info = InfoPanel(
             "Select the primary programming language for your project",
             icon="💡",
-            variant="info"
+            variant="info",
         )
         card_content.mount(info)
 
         # Add action buttons
         button_container = card_content.mount(Container(classes="button-row"))
-        button_container.mount(StyledButton("Next", variant="primary", id="next_button"))
-        button_container.mount(StyledButton("Cancel", variant="default", id="cancel_button"))
+        button_container.mount(
+            StyledButton("Next", variant="primary", id="next_button")
+        )
+        button_container.mount(
+            StyledButton("Cancel", variant="default", id="cancel_button")
+        )
 
     @on(RadioSet.Changed, "#language_radio")
     def handle_language_selection(self, event: RadioSet.Changed) -> None:
@@ -84,7 +87,9 @@ class LanguageSelectScreenV2(BaseScreen):
 
             # Show warning if no templates
             if not self.selected_language.has_templates:
-                self.show_warning(f"Note: {self.selected_language.display_name} templates are not yet available.")
+                self.show_warning(
+                    f"Note: {self.selected_language.display_name} templates are not yet available."
+                )
             else:
                 self.clear_messages()
 

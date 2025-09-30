@@ -4,18 +4,19 @@ This module focuses on critical business logic testing while avoiding redundant,
 verbose, or brittle test scenarios.
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
 from pydantic import ValidationError
 
 from rapid_tui.models import (
-    Language,
     Assistant,
     AssistantConfig,
-    InitializationConfig,
     CopyOperation,
-    InitializationResult,
     FileOperation,
+    InitializationConfig,
+    InitializationResult,
+    Language,
     UpdateResult,
 )
 
@@ -155,7 +156,6 @@ class TestCopyOperation:
         assert relative_path == "project/.claude/agent.md"
 
 
-
 class TestInitializationResult:
     """Test InitializationResult aggregation logic."""
 
@@ -238,7 +238,6 @@ class TestFileOperation:
 
         assert operation.relative_source == "source/file.md"
         assert operation.relative_target == "target/file.md"
-
 
 
 class TestUpdateResult:

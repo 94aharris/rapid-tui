@@ -1,13 +1,11 @@
 """Assistant selection screen for RAPID TUI."""
 
-from textual.app import ComposeResult
-from textual.widgets import Static, Checkbox, Button, Label
-from textual.containers import Horizontal, Vertical, Grid
 from textual import on
-from typing import List, Set
+from textual.containers import Horizontal, Vertical
+from textual.widgets import Button, Checkbox, Static
 
-from rapid_tui.screens.base import BaseScreen
 from rapid_tui.models import Assistant, Language
+from rapid_tui.screens.base import BaseScreen
 
 
 class AssistantSelectScreen(BaseScreen):
@@ -24,7 +22,7 @@ class AssistantSelectScreen(BaseScreen):
         """
         super().__init__(name="assistant_select", title="Select AI Assistants")
         self.language = language
-        self.selected_assistants: Set[Assistant] = set()
+        self.selected_assistants: set[Assistant] = set()
 
     def setup_content(self) -> None:
         """Setup the assistant selection interface."""
@@ -49,7 +47,7 @@ class AssistantSelectScreen(BaseScreen):
             checkbox = Checkbox(
                 f"  {assistant.display_name}",
                 value=False,
-                id=f"assistant_{assistant.value}"
+                id=f"assistant_{assistant.value}",
             )
 
             # Add description based on assistant
@@ -67,7 +65,7 @@ class AssistantSelectScreen(BaseScreen):
         # Add note about .rapid directory
         rapid_note = Static(
             "Note: The .rapid directory will always be created with full template structure",
-            classes="rapid-note"
+            classes="rapid-note",
         )
 
         assistant_container.mount(rapid_note)
@@ -77,7 +75,7 @@ class AssistantSelectScreen(BaseScreen):
             Button("Previous", variant="default", id="prev_button"),
             Button("Next", variant="primary", id="next_button"),
             Button("Cancel", variant="default", id="cancel_button"),
-            classes="button-row"
+            classes="button-row",
         )
 
         content.mount(button_row)
@@ -149,7 +147,7 @@ class AssistantSelectScreen(BaseScreen):
 
         return True
 
-    def get_result(self) -> List[Assistant]:
+    def get_result(self) -> list[Assistant]:
         """Get the selected assistants."""
         assistants = list(self.selected_assistants)
         if Assistant.RAPID_ONLY not in assistants:

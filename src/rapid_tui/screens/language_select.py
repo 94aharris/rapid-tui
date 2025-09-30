@@ -1,13 +1,11 @@
 """Language selection screen for RAPID TUI."""
 
-from textual.app import ComposeResult
-from textual.widgets import Static, RadioSet, RadioButton, Button
-from textual.containers import Horizontal, Vertical
 from textual import on
-from typing import Optional
+from textual.containers import Horizontal, Vertical
+from textual.widgets import Button, RadioButton, RadioSet, Static
 
-from rapid_tui.screens.base import BaseScreen
 from rapid_tui.models import Language
+from rapid_tui.screens.base import BaseScreen
 
 
 class LanguageSelectScreen(BaseScreen):
@@ -18,7 +16,7 @@ class LanguageSelectScreen(BaseScreen):
     def __init__(self):
         """Initialize language selection screen."""
         super().__init__(name="language_select", title="Select Programming Language")
-        self.selected_language: Optional[Language] = None
+        self.selected_language: Language | None = None
 
     def setup_content(self) -> None:
         """Setup the language selection interface."""
@@ -119,6 +117,6 @@ class LanguageSelectScreen(BaseScreen):
         self.clear_messages()
         return True
 
-    def get_result(self) -> Optional[Language]:
+    def get_result(self) -> Language | None:
         """Get the selected language."""
         return self.selected_language

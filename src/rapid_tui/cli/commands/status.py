@@ -1,14 +1,13 @@
 """Status command for RAPID CLI."""
 
-from pathlib import Path
 from datetime import datetime
-from typing import Optional
+from pathlib import Path
+from typing import Annotated
 
 import typer
 from rich.console import Console
 from rich.table import Table
 from rich.tree import Tree
-from rich import print as rprint
 
 from rapid_tui.cli.main import app
 
@@ -18,10 +17,10 @@ console = Console()
 @app.command()
 def status(
     ctx: typer.Context,
-    path: Optional[Path] = typer.Option(
-        None, "--path", "-p",
-        help="Project path (default: current directory)"
-    )
+    path: Annotated[
+        Path | None,
+        typer.Option("--path", "-p", help="Project path (default: current directory)"),
+    ] = None,
 ):
     """Check RAPID framework initialization status in current project."""
 
@@ -29,7 +28,9 @@ def status(
     rapid_dir = project_path / ".rapid"
 
     if not rapid_dir.exists():
-        console.print("[yellow]⚠ RAPID framework not initialized in this project[/yellow]")
+        console.print(
+            "[yellow]⚠ RAPID framework not initialized in this project[/yellow]"
+        )
         console.print("\nRun [cyan]rapid init[/cyan] to initialize RAPID framework")
         raise typer.Exit(1)
 
@@ -75,7 +76,9 @@ def _show_statistics(rapid_dir: Path):
 
     # Count commands
     commands_dir = rapid_dir / "commands"
-    command_count = sum(1 for _ in commands_dir.rglob("*.md")) if commands_dir.exists() else 0
+    command_count = (
+        sum(1 for _ in commands_dir.rglob("*.md")) if commands_dir.exists() else 0
+    )
     table.add_row("Command Templates", str(command_count))
 
     # Check for assistant-specific directories
@@ -119,7 +122,9 @@ def _check_health(rapid_dir: Path):
         stat = log_file.stat()
         age_days = (datetime.now().timestamp() - stat.st_mtime) / 86400
         if age_days > 30:
-            suggestions.append(f"Old log file: {log_file.name} ({int(age_days)} days old)")
+            suggestions.append(
+                f"Old log file: {log_file.name} ({int(age_days)} days old)"
+            )
 
     # Display health check results
     if issues:

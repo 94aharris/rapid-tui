@@ -1,7 +1,6 @@
 """Centralized theme configuration for RAPID TUI."""
 
 from dataclasses import dataclass
-from typing import Dict, Any
 
 
 @dataclass
@@ -55,5 +54,5 @@ dark_theme = Theme(
     accent="green",
     error="red",
     warning="yellow",
-    success="green"
+    success="green",
 )

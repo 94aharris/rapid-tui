@@ -4,9 +4,9 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from rapid_tui.models import Language, Assistant
-from rapid_tui.config import get_language_templates
 from rapid_tui.cli.main import app
+from rapid_tui.config import get_language_templates
+from rapid_tui.models import Assistant, Language
 
 console = Console()
 
@@ -15,9 +15,8 @@ console = Console()
 def list_command(
     ctx: typer.Context,
     what: str = typer.Argument(
-        ...,
-        help="What to list: languages, assistants, templates"
-    )
+        ..., help="What to list: languages, assistants, templates"
+    ),
 ):
     """List available options for RAPID framework."""
 
@@ -60,7 +59,7 @@ def _list_assistants():
     assistant_descriptions = {
         Assistant.CLAUDE_CODE: "Anthropic's Claude AI coding assistant",
         Assistant.GITHUB_COPILOT: "GitHub's AI pair programmer",
-        Assistant.RAPID_ONLY: "Basic RAPID framework files only"
+        Assistant.RAPID_ONLY: "Basic RAPID framework files only",
     }
 
     for asst in Assistant:
@@ -68,7 +67,9 @@ def _list_assistants():
         table.add_row(code, asst.display_name, assistant_descriptions[asst])
 
     console.print(table)
-    console.print("\n[dim]Use with: rapid init --assistant <code> (can specify multiple)[/dim]")
+    console.print(
+        "\n[dim]Use with: rapid init --assistant <code> (can specify multiple)[/dim]"
+    )
 
 
 def _list_templates():

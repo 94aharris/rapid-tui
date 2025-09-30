@@ -1,10 +1,11 @@
 """Logo display utility for RAPID CLI."""
 
 from pathlib import Path
-from rich.console import Console
-from rich.text import Text
-from rich.panel import Panel
+
 from rich.align import Align
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
 
 
 def get_logo_path() -> Path:
@@ -36,7 +37,7 @@ def load_logo() -> str:
         return None
 
     try:
-        with open(logo_path, "r", encoding="utf-8") as f:
+        with open(logo_path, encoding="utf-8") as f:
             return f.read()
     except Exception:
         return None

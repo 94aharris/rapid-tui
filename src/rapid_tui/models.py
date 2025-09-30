@@ -2,7 +2,8 @@
 
 from enum import Enum
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import Any
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -53,14 +54,16 @@ class AssistantConfig(BaseModel):
 
     name: str
     base_dir: str
-    agents_path: Optional[str] = None
+    agents_path: str | None = None
     commands_path: str
-    instructions_file: Optional[str] = None  # NEW: Filename for instruction file (e.g., "CLAUDE.md")
+    instructions_file: str | None = (
+        None  # NEW: Filename for instruction file (e.g., "CLAUDE.md")
+    )
     copy_agents: bool = True
     copy_commands: bool = True
     copy_instructions: bool = False  # NEW: Whether to copy instruction files
 
-    def get_agent_dir(self, project_root: Path) -> Optional[Path]:
+    def get_agent_dir(self, project_root: Path) -> Path | None:
         """Get full path to agent directory."""
         if not self.agents_path:
             return None
@@ -70,7 +73,7 @@ class AssistantConfig(BaseModel):
         """Get full path to commands directory."""
         return project_root / self.base_dir / self.commands_path
 
-    def get_instructions_file(self, project_root: Path) -> Optional[Path]:
+    def get_instructions_file(self, project_root: Path) -> Path | None:
         """Get the full path to the instructions file."""
         if not self.instructions_file:
             return None
@@ -80,13 +83,13 @@ class AssistantConfig(BaseModel):
 class InitializationConfig(BaseModel):
     """User selections for initialization."""
 
-    language: Optional[Language] = None
-    assistants: List[Assistant] = Field(default_factory=list)
+    language: Language | None = None
+    assistants: list[Assistant] = Field(default_factory=list)
     project_path: Path = Field(default_factory=Path.cwd)
 
     @field_validator("assistants")
     @classmethod
-    def validate_assistants(cls, v: List[Assistant]) -> List[Assistant]:
+    def validate_assistants(cls, v: list[Assistant]) -> list[Assistant]:
         """Ensure at least one assistant is selected."""
         if not v:
             raise ValueError("At least one assistant must be selected")
@@ -112,9 +115,9 @@ class CopyOperation(BaseModel):
     source: Path
     destination: Path
     operation_type: str  # "agent" or "command"
-    assistant: Optional[Assistant] = None
+    assistant: Assistant | None = None
     success: bool = True
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
     @property
     def relative_destination(self) -> str:
@@ -130,14 +133,14 @@ class InitializationResult(BaseModel):
     """Result of the initialization process."""
 
     success: bool
-    operations: List[CopyOperation]
+    operations: list[CopyOperation]
     total_files_copied: int = 0
     total_directories_created: int = 0
-    errors: List[str] = Field(default_factory=list)
-    warnings: List[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
 
     @property
-    def summary(self) -> Dict[str, Any]:
+    def summary(self) -> dict[str, Any]:
         """Generate summary statistics."""
         return {
             "success": self.success,
@@ -194,13 +197,13 @@ class UpdateResult(BaseModel):
     """Result of update synchronization."""
 
     success: bool
-    operations: List[FileOperation]
+    operations: list[FileOperation]
     files_copied: int = 0
     files_skipped: int = 0
-    errors: List[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
 
     @property
-    def summary(self) -> Dict[str, Any]:
+    def summary(self) -> dict[str, Any]:
         """Generate summary statistics."""
         return {
             "success": self.success,

@@ -3,13 +3,13 @@
 This module focuses on essential CLI logic, version display, and context management.
 """
 
-import pytest
 from unittest.mock import Mock
 
+import pytest
 import typer
 
-from rapid_tui.cli.main import app, version_callback, main, cli
 from rapid_tui import __version__
+from rapid_tui.cli.main import cli, main, version_callback
 
 
 class TestVersionCallback:
@@ -81,6 +81,3 @@ class TestCLIEntryPoint:
         cli()
 
         mock_app.assert_called_once()
-
-
-

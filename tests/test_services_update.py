@@ -3,12 +3,8 @@
 This module focuses on synchronization logic and file comparison operations.
 """
 
-import pytest
-from pathlib import Path
-from unittest.mock import Mock, patch
-
+from rapid_tui.models import Assistant, UpdateResult
 from rapid_tui.services.update import UpdateService
-from rapid_tui.models import Assistant, UpdateResult, FileOperation
 from tests.test_helpers import MockConsole
 
 
@@ -68,7 +64,6 @@ class TestUpdateServiceSync:
         """Test syncing to Claude assistant with agents and commands."""
         # Mock console and shutil
         mocker.patch("rapid_tui.services.update.Console", return_value=MockConsole())
-        mock_shutil_copy2 = mocker.patch("rapid_tui.services.update.shutil.copy2")
 
         # Create .rapid directory structure
         rapid_dir = tmp_path / ".rapid"
@@ -92,7 +87,6 @@ class TestUpdateServiceSync:
     def test_sync_agent_copilot_structure(self, tmp_path, mocker):
         """Test syncing to Copilot assistant (commands only, no agents)."""
         mocker.patch("rapid_tui.services.update.Console", return_value=MockConsole())
-        mock_shutil_copy2 = mocker.patch("rapid_tui.services.update.shutil.copy2")
 
         # Create .rapid directory with prompts (for Copilot)
         rapid_dir = tmp_path / ".rapid"
@@ -152,7 +146,6 @@ class TestUpdateServiceConsolidate:
     def test_consolidate_agent_claude_to_rapid(self, tmp_path, mocker):
         """Test consolidating Claude files back to .rapid."""
         mocker.patch("rapid_tui.services.update.Console", return_value=MockConsole())
-        mock_shutil_copy2 = mocker.patch("rapid_tui.services.update.shutil.copy2")
 
         # Create .rapid and .claude directories
         rapid_dir = tmp_path / ".rapid"
@@ -185,7 +178,6 @@ class TestUpdateServiceConsolidate:
 class TestUpdateServiceFileOperations:
     """Test file comparison and copying logic."""
 
-
     def test_compare_files_target_not_exists(self, tmp_path):
         """Test file comparison when target doesn't exist."""
         source_file = tmp_path / "source.md"
@@ -215,8 +207,6 @@ class TestUpdateServiceFileOperations:
         assert operation.success is True
         mock_shutil_copy2.assert_called_once_with(source_file, target_file)
 
-
-
     def test_sync_file_error_handling(self, tmp_path, mocker):
         """Test file sync error handling."""
         mock_shutil_copy2 = mocker.patch("rapid_tui.services.update.shutil.copy2")
@@ -237,7 +227,6 @@ class TestUpdateServiceFileOperations:
     def test_sync_directory_structure_preserves_paths(self, tmp_path, mocker):
         """Test that directory sync preserves nested path structure."""
         mocker.patch("rapid_tui.services.update.Console", return_value=MockConsole())
-        mock_shutil_copy2 = mocker.patch("rapid_tui.services.update.shutil.copy2")
 
         # Create nested source structure
         source_dir = tmp_path / "source"

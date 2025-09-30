@@ -1,11 +1,12 @@
 """Base screen class for RAPID TUI screens."""
 
-from textual.screen import Screen
-from textual.widgets import Header, Footer, Static
-from textual.containers import Container, Vertical
-from textual.app import ComposeResult
-from typing import Optional, Any
 import logging
+from typing import Any
+
+from textual.app import ComposeResult
+from textual.containers import Container, Vertical
+from textual.screen import Screen
+from textual.widgets import Footer, Header, Static
 
 
 class BaseScreen(Screen):
@@ -23,8 +24,8 @@ class BaseScreen(Screen):
         """
         super().__init__(name=name)
         self.title = title
-        self.error_message: Optional[str] = None
-        self.warning_message: Optional[str] = None
+        self.error_message: str | None = None
+        self.warning_message: str | None = None
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def compose(self) -> ComposeResult:
@@ -33,7 +34,7 @@ class BaseScreen(Screen):
         yield Container(
             Static(self.title, classes="screen-title"),
             Vertical(id="content", classes="content-container"),
-            id="main-container"
+            id="main-container",
         )
         yield Footer()
 

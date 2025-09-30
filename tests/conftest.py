@@ -1,20 +1,20 @@
 """Pytest configuration and fixtures for RAPID TUI tests."""
 
 from pathlib import Path
-from typing import Dict, List
+
 import pytest
 
-from rapid_tui.models import Language, Assistant, InitializationConfig, AssistantConfig
+from rapid_tui.models import Assistant, AssistantConfig, InitializationConfig, Language
 
 
 @pytest.fixture
-def sample_languages() -> List[Language]:
+def sample_languages() -> list[Language]:
     """Provide all Language enum values for testing."""
     return list(Language)
 
 
 @pytest.fixture
-def sample_assistants() -> List[Assistant]:
+def sample_assistants() -> list[Assistant]:
     """Provide all Assistant enum values for testing."""
     return list(Assistant)
 
@@ -62,7 +62,7 @@ def mock_initialization_config(tmp_path: Path) -> InitializationConfig:
 
 
 @pytest.fixture
-def sample_assistant_configs() -> Dict[Assistant, AssistantConfig]:
+def sample_assistant_configs() -> dict[Assistant, AssistantConfig]:
     """Provide sample assistant configurations for testing."""
     return {
         Assistant.CLAUDE_CODE: AssistantConfig(

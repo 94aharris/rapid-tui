@@ -1,12 +1,13 @@
 """Initialization service for shared business logic."""
 
 import logging
+from collections.abc import Callable
 from pathlib import Path
-from typing import List, Optional, Callable
 
 from rapid_tui.models import (
-    Language, Assistant, InitializationConfig,
-    InitializationResult
+    Assistant,
+    InitializationResult,
+    Language,
 )
 from rapid_tui.utils.file_operations import TemplateManager
 
@@ -31,9 +32,9 @@ class InitializationService:
     def initialize(
         self,
         language: Language,
-        assistants: List[Assistant],
+        assistants: list[Assistant],
         verbose: bool = False,
-        progress_callback: Optional[Callable] = None
+        progress_callback: Callable | None = None,
     ) -> InitializationResult:
         """
         Initialize RAPID framework in the project.
@@ -47,32 +48,20 @@ class InitializationService:
         Returns:
             InitializationResult with operation details
         """
-        # Create configuration
-        config = InitializationConfig(
-            language=language,
-            assistants=assistants,
-            project_path=self.project_path
-        )
-
         # Validate environment
         template_manager = TemplateManager(
-            project_root=self.project_path,
-            dry_run=self.dry_run
+            project_root=self.project_path, dry_run=self.dry_run
         )
 
         is_valid, issues = template_manager.validate_environment()
         if not is_valid and not self.force:
-            return InitializationResult(
-                success=False,
-                operations=[],
-                errors=issues
-            )
+            return InitializationResult(success=False, operations=[], errors=issues)
 
         # Perform initialization
         result = template_manager.initialize_project(
             language=language,
             assistants=assistants,
-            progress_callback=progress_callback
+            progress_callback=progress_callback,
         )
 
         if verbose and result.operations:
@@ -101,12 +90,12 @@ class InitializationService:
             commands_dir = rapid_dir / "commands"
 
             status["agent_count"] = (
-                sum(1 for _ in agents_dir.rglob("*.md"))
-                if agents_dir.exists() else 0
+                sum(1 for _ in agents_dir.rglob("*.md")) if agents_dir.exists() else 0
             )
             status["command_count"] = (
                 sum(1 for _ in commands_dir.rglob("*.md"))
-                if commands_dir.exists() else 0
+                if commands_dir.exists()
+                else 0
             )
 
             # Check for assistant directories

@@ -1,17 +1,16 @@
 """Configuration and constants for RAPID TUI."""
 
-from pathlib import Path
-from typing import Dict, Optional, List
 import logging
-from rapid_tui.models import Assistant, AssistantConfig, Language
+from pathlib import Path
 
+from rapid_tui.models import Assistant, AssistantConfig, Language
 
 # Logging configuration
 LOG_FILE = ".rapid/initialization.log"
 LOG_LEVEL = logging.INFO
 
 # Assistant-specific configurations
-ASSISTANT_CONFIGS: Dict[Assistant, AssistantConfig] = {
+ASSISTANT_CONFIGS: dict[Assistant, AssistantConfig] = {
     Assistant.CLAUDE_CODE: AssistantConfig(
         name="Claude Code",
         base_dir=".claude",
@@ -123,7 +122,7 @@ def get_assistant_config(assistant: Assistant) -> AssistantConfig:
     return ASSISTANT_CONFIGS.get(assistant)
 
 
-def get_language_templates(language: Language) -> Dict[str, list]:
+def get_language_templates(language: Language) -> dict[str, list]:
     """Get template files for a specific language."""
     return TEMPLATE_MAPPINGS.get(language, {"agents": [], "commands": []})
 
@@ -136,11 +135,11 @@ AGENT_ALIASES = {
 }
 
 
-def resolve_agent_name(agent_input: str) -> Optional[Assistant]:
+def resolve_agent_name(agent_input: str) -> Assistant | None:
     """Resolve user input to Assistant enum."""
     return AGENT_ALIASES.get(agent_input.lower())
 
 
-def get_available_agent_names() -> List[str]:
+def get_available_agent_names() -> list[str]:
     """Get list of valid agent names for error messages."""
     return list(AGENT_ALIASES.keys())

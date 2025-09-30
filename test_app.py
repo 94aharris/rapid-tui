@@ -3,8 +3,8 @@
 
 import subprocess
 import sys
-import os
 from pathlib import Path
+
 
 def test_rapid_tui():
     """Test that rapid-tui works correctly."""
@@ -12,10 +12,14 @@ def test_rapid_tui():
     # Test 1: Verify the app can be imported
     print("Test 1: Testing that rapid-tui can be imported...")
     result = subprocess.run(
-        [sys.executable, "-c", "from rapid_tui.app import RapidTUI; print('App imports successfully')"],
+        [
+            sys.executable,
+            "-c",
+            "from rapid_tui.app import RapidTUI; print('App imports successfully')",
+        ],
         capture_output=True,
         text=True,
-        timeout=2
+        timeout=2,
     )
 
     if "App imports successfully" in result.stdout:
@@ -28,9 +32,9 @@ def test_rapid_tui():
     # Test 2: Import test
     print("\nTest 2: Testing module imports...")
     try:
-        from rapid_tui.models import Language, Assistant
         from rapid_tui.config import get_assistant_config
-        from rapid_tui.utils.file_operations import TemplateManager
+        from rapid_tui.models import Assistant, Language
+
         print("✅ Test 2 passed: All modules imported successfully")
 
         # Test 3: Enum values
@@ -54,6 +58,7 @@ def test_rapid_tui():
     print("1. Navigate to your project directory")
     print("2. Run: rapid-tui")
     return True
+
 
 if __name__ == "__main__":
     # Ensure we're running with the virtual environment

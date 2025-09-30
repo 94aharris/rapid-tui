@@ -2,15 +2,14 @@
 
 import json
 from pathlib import Path
-from typing import Optional, List
+from typing import Annotated
 
 import typer
 from rich.console import Console
 from rich.table import Table
-from rich import print as rprint
 
-from rapid_tui.models import Language, Assistant
 from rapid_tui.cli.main import app
+from rapid_tui.models import Assistant, Language
 
 console = Console()
 
@@ -20,11 +19,21 @@ CONFIG_FILE_NAME = ".rapidrc.json"
 @app.command()
 def config(
     ctx: typer.Context,
-    show: bool = typer.Option(False, "--show", help="Show current configuration"),
-    set_language: Optional[str] = typer.Option(None, "--set-language", help="Set default language"),
-    set_assistants: Optional[List[str]] = typer.Option(None, "--set-assistant", help="Set default assistants"),
-    global_config: bool = typer.Option(False, "--global", help="Use global config instead of local"),
-    reset: bool = typer.Option(False, "--reset", help="Reset configuration to defaults")
+    show: Annotated[
+        bool, typer.Option("--show", help="Show current configuration")
+    ] = False,
+    set_language: Annotated[
+        str | None, typer.Option("--set-language", help="Set default language")
+    ] = None,
+    set_assistants: Annotated[
+        list[str] | None, typer.Option("--set-assistant", help="Set default assistants")
+    ] = None,
+    global_config: Annotated[
+        bool, typer.Option("--global", help="Use global config instead of local")
+    ] = False,
+    reset: Annotated[
+        bool, typer.Option("--reset", help="Reset configuration to defaults")
+    ] = False,
 ):
     """Manage RAPID configuration."""
 
@@ -61,12 +70,12 @@ def _load_config(config_path: Path) -> dict:
             "defaults": {
                 "language": "python",
                 "assistants": ["claude_code", "rapid_only"],
-                "verbose": False
+                "verbose": False,
             }
         }
 
     try:
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             return json.load(f)
     except json.JSONDecodeError:
         console.print(f"[red]Error: Invalid JSON in {config_path}[/red]")
@@ -104,10 +113,14 @@ def _show_config(config_path: Path):
     console.print(table)
 
     if not config_path.exists():
-        console.print("\n[dim]Note: Using default configuration (file does not exist)[/dim]")
+        console.print(
+            "\n[dim]Note: Using default configuration (file does not exist)[/dim]"
+        )
 
 
-def _update_config(config_path: Path, language: Optional[str], assistants: Optional[List[str]]):
+def _update_config(
+    config_path: Path, language: str | None, assistants: list[str] | None
+):
     """Update configuration settings."""
     config = _load_config(config_path)
 
@@ -121,12 +134,14 @@ def _update_config(config_path: Path, language: Optional[str], assistants: Optio
         try:
             lang = Language(language)
             config["defaults"]["language"] = lang.value
-            console.print(f"[green]Default language set to: {lang.display_name}[/green]")
+            console.print(
+                f"[green]Default language set to: {lang.display_name}[/green]"
+            )
             updated = True
         except ValueError:
             console.print(f"[red]Error: Invalid language '{language}'[/red]")
             console.print("Valid options: angular, python, generic, see-sharp")
-            raise typer.Exit(1)
+            raise typer.Exit(1) from None
 
     if assistants:
         # Validate assistants
@@ -138,10 +153,12 @@ def _update_config(config_path: Path, language: Optional[str], assistants: Optio
             except ValueError:
                 console.print(f"[red]Error: Invalid assistant '{assistant}'[/red]")
                 console.print("Valid options: claude-code, github-copilot, rapid-only")
-                raise typer.Exit(1)
+                raise typer.Exit(1) from None
 
         config["defaults"]["assistants"] = valid_assistants
-        console.print(f"[green]Default assistants set to: {', '.join(assistants)}[/green]")
+        console.print(
+            f"[green]Default assistants set to: {', '.join(assistants)}[/green]"
+        )
         updated = True
 
     if updated:

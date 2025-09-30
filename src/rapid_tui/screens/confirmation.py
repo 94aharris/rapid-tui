@@ -1,22 +1,17 @@
 """Confirmation and progress screen for RAPID TUI."""
 
-from textual.app import ComposeResult
-from textual.widgets import Static, Button, ProgressBar, DataTable, RichLog
-from textual.containers import Horizontal, Vertical, Container
-from textual import work
+from textual import on, work
+from textual.containers import Container, Horizontal, Vertical
 from textual.message import Message
-from textual import on
-from typing import List, Optional
-from pathlib import Path
-import asyncio
+from textual.widgets import Button, DataTable, ProgressBar, RichLog, Static
 
-from rapid_tui.screens.base import BaseScreen
 from rapid_tui.models import (
-    Language,
     Assistant,
     InitializationConfig,
     InitializationResult,
+    Language,
 )
+from rapid_tui.screens.base import BaseScreen
 from rapid_tui.utils.file_operations import TemplateManager
 
 
@@ -45,10 +40,10 @@ class ConfirmationScreen(BaseScreen):
         super().__init__(name="confirmation", title="Confirm Initialization")
         self.config = config
         self.template_manager = TemplateManager(config.project_path)
-        self.result: Optional[InitializationResult] = None
-        self.progress_bar: Optional[ProgressBar] = None
-        self.progress_label: Optional[Static] = None
-        self.log_widget: Optional[RichLog] = None
+        self.result: InitializationResult | None = None
+        self.progress_bar: ProgressBar | None = None
+        self.progress_label: Static | None = None
+        self.log_widget: RichLog | None = None
 
     def setup_content(self) -> None:
         """Setup the confirmation interface."""

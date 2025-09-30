@@ -1,8 +1,8 @@
 """Custom styled widgets for RAPID TUI."""
 
-from textual.widgets import Button, Static, Container
-from textual.containers import Vertical, Horizontal
 from textual.app import ComposeResult
+from textual.containers import Horizontal, Vertical
+from textual.widgets import Button, Container, Static
 
 
 class StyledButton(Button):
@@ -38,13 +38,7 @@ class InfoPanel(Vertical):
 
     DEFAULT_CLASSES = "info-panel"
 
-    def __init__(
-        self,
-        message: str,
-        icon: str = "ℹ️",
-        variant: str = "info",
-        **kwargs
-    ):
+    def __init__(self, message: str, icon: str = "ℹ️", variant: str = "info", **kwargs):
         """Initialize info panel."""
         super().__init__(**kwargs)
         self.message = message
@@ -56,7 +50,7 @@ class InfoPanel(Vertical):
         yield Horizontal(
             Static(self.icon, classes="info-icon"),
             Static(self.message, classes="info-text"),
-            classes="info-content"
+            classes="info-content",
         )
 
 

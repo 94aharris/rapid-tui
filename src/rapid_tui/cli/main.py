@@ -1,19 +1,10 @@
 """Main Typer CLI application for RAPID framework."""
 
-import sys
-from pathlib import Path
-from typing import Optional, List
-
 import typer
 from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich import print as rprint
-import click
 
-from rapid_tui.models import Language, Assistant
-from rapid_tui.utils.logo import display_welcome_banner
 from rapid_tui import __version__
+from rapid_tui.utils.logo import display_welcome_banner
 
 app = typer.Typer(
     name="rapid",
@@ -32,13 +23,12 @@ def version_callback(value: bool):
 
 
 # Import commands to register them with the app
-from rapid_tui.cli.commands import init, list, config, status, update
 
 
 @app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
-    version: Optional[bool] = typer.Option(
+    version: bool | None = typer.Option(
         None,
         "--version",
         callback=version_callback,
@@ -53,13 +43,11 @@ def main(
         False, "--dry-run", help="Simulate operations without making changes"
     ),
 ):
-    """
+    f"""
     RAPID Framework CLI - Initialize AI-driven development projects
 
-    Version: {version}
-    """.format(
-        version=__version__
-    )
+    Version: {__version__}
+    """  # noqa: B021
     ctx.ensure_object(dict)
     ctx.obj["ui"] = ui
     ctx.obj["verbose"] = verbose

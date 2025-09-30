@@ -1,21 +1,18 @@
 """Tests for rapid_tui.config module."""
 
-import pytest
-from pathlib import Path
-
 from rapid_tui.config import (
-    get_templates_dir,
-    get_agents_template_dir,
-    get_commands_template_dir,
-    get_assistant_config,
-    get_language_templates,
-    resolve_agent_name,
-    get_available_agent_names,
     ASSISTANT_CONFIGS,
     TEMPLATE_MAPPINGS,
     UI_THEME,
+    get_agents_template_dir,
+    get_assistant_config,
+    get_available_agent_names,
+    get_commands_template_dir,
+    get_language_templates,
+    get_templates_dir,
+    resolve_agent_name,
 )
-from rapid_tui.models import Assistant, Language, AssistantConfig
+from rapid_tui.models import Assistant, AssistantConfig, Language
 
 
 class TestTemplatePaths:
@@ -196,7 +193,6 @@ class TestConfigurationConstants:
             assert isinstance(UI_THEME[key], str)
             assert len(UI_THEME[key]) > 0
 
-
     def test_assistant_configs_structure(self):
         """Test ASSISTANT_CONFIGS has correct structure."""
         assert isinstance(ASSISTANT_CONFIGS, dict)
@@ -250,4 +246,3 @@ class TestConfigurationIntegration:
             assert isinstance(templates, dict)
             assert "agents" in templates
             assert "commands" in templates
-

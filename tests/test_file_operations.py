@@ -1,7 +1,6 @@
 """Tests for file operations and TemplateManager."""
 
 import tempfile
-import pytest
 from pathlib import Path
 
 from rapid_tui.utils.file_operations import TemplateManager

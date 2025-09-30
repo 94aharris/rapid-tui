@@ -1,16 +1,15 @@
 """Update command for RAPID CLI."""
 
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
 from rapid_tui.cli.main import app
+from rapid_tui.config import get_available_agent_names, resolve_agent_name
 from rapid_tui.models import Assistant
 from rapid_tui.services.update import UpdateService
-from rapid_tui.config import resolve_agent_name, get_available_agent_names
 
 console = Console()
 
@@ -18,7 +17,7 @@ console = Console()
 @app.command()
 def update(
     ctx: typer.Context,
-    agent: Optional[str] = typer.Option(
+    agent: str | None = typer.Option(
         None, "--agent", "-a", help="Update specific agent (claude, copilot, all)"
     ),
     force: bool = typer.Option(
@@ -103,7 +102,7 @@ def update(
 
 
 def _show_update_summary(
-    agent: Optional[Assistant], force: bool, dry_run: bool, verbose: bool, reverse: bool
+    agent: Assistant | None, force: bool, dry_run: bool, verbose: bool, reverse: bool
 ):
     """Show summary of update operation before execution."""
     if dry_run or verbose:

@@ -1,20 +1,18 @@
 """Initialize command for RAPID CLI."""
 
-import sys
 from pathlib import Path
-from typing import Optional, List
+from typing import Annotated
 
 import typer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich.prompt import Prompt, Confirm
+from rich.prompt import Confirm, Prompt
 from rich.table import Table
-from rich import print as rprint
 
-from rapid_tui.models import Language, Assistant, InitializationConfig
-from rapid_tui.services.initialization import InitializationService
-from rapid_tui.config import resolve_agent_name, get_available_agent_names
 from rapid_tui.cli.main import app
+from rapid_tui.config import get_available_agent_names, resolve_agent_name
+from rapid_tui.models import Assistant, Language
+from rapid_tui.services.initialization import InitializationService
 
 console = Console()
 
@@ -22,26 +20,33 @@ console = Console()
 @app.command()
 def init(
     ctx: typer.Context,
-    language: Optional[str] = typer.Option(
-        None, "--language", "-l",
-        help="Programming language (angular, python, generic, see-sharp)"
-    ),
-    assistants: Optional[List[str]] = typer.Option(
-        None, "--assistant", "-a",
-        help="AI assistants to configure (can specify multiple)"
-    ),
-    interactive: bool = typer.Option(
-        False, "--interactive", "-i",
-        help="Interactive mode for selections"
-    ),
-    force: bool = typer.Option(
-        False, "--force", "-f",
-        help="Overwrite existing files"
-    ),
-    path: Optional[Path] = typer.Option(
-        None, "--path", "-p",
-        help="Project path (default: current directory)"
-    )
+    language: Annotated[
+        str | None,
+        typer.Option(
+            "--language",
+            "-l",
+            help="Programming language (angular, python, generic, see-sharp)",
+        ),
+    ] = None,
+    assistants: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--assistant",
+            "-a",
+            help="AI assistants to configure (can specify multiple)",
+        ),
+    ] = None,
+    interactive: Annotated[
+        bool,
+        typer.Option("--interactive", "-i", help="Interactive mode for selections"),
+    ] = False,
+    force: Annotated[
+        bool, typer.Option("--force", "-f", help="Overwrite existing files")
+    ] = False,
+    path: Annotated[
+        Path | None,
+        typer.Option("--path", "-p", help="Project path (default: current directory)"),
+    ] = None,
 ):
     """Initialize RAPID framework in your project."""
 
@@ -68,7 +73,7 @@ def init(
             except ValueError:
                 console.print(f"[red]Error: Invalid language '{language}'[/red]")
                 console.print("Valid options: angular, python, generic, see-sharp")
-                raise typer.Exit(1)
+                raise typer.Exit(1) from None
         else:
             selected_language = _prompt_for_language()
 
@@ -78,7 +83,9 @@ def init(
                 resolved = resolve_agent_name(assistant)
                 if resolved is None:
                     console.print(f"[red]Error: Invalid assistant '{assistant}'[/red]")
-                    console.print(f"Valid options: {', '.join(get_available_agent_names())}")
+                    console.print(
+                        f"Valid options: {', '.join(get_available_agent_names())}"
+                    )
                     raise typer.Exit(1)
                 selected_assistants.append(resolved)
         else:
@@ -89,7 +96,9 @@ def init(
         selected_assistants.append(Assistant.RAPID_ONLY)
 
     # Show summary
-    _show_initialization_summary(selected_language, selected_assistants, project_path, dry_run)
+    _show_initialization_summary(
+        selected_language, selected_assistants, project_path, dry_run
+    )
 
     if not force:
         if not Confirm.ask("Proceed with initialization?"):
@@ -103,13 +112,11 @@ def init(
         transient=True,
         console=console,
     ) as progress:
-        task = progress.add_task("Initializing RAPID framework...", total=None)
+        progress.add_task("Initializing RAPID framework...", total=None)
 
         service = InitializationService(project_path, dry_run=dry_run, force=force)
         result = service.initialize(
-            language=selected_language,
-            assistants=selected_assistants,
-            verbose=verbose
+            language=selected_language, assistants=selected_assistants, verbose=verbose
         )
 
     # Show results
@@ -149,9 +156,7 @@ def _interactive_selection():
     console.print(language_table)
 
     language_choice = Prompt.ask(
-        "\nSelect language",
-        choices=[lang.value for lang in Language],
-        default="python"
+        "\nSelect language", choices=[lang.value for lang in Language], default="python"
     )
     selected_language = Language(language_choice)
 
@@ -172,16 +177,15 @@ def _interactive_selection():
     console.print(assistant_table)
 
     console.print("\n[dim]You can select multiple assistants (space-separated)[/dim]")
-    assistant_choices = Prompt.ask(
-        "Select assistants",
-        default="claude"
-    )
+    assistant_choices = Prompt.ask("Select assistants", default="claude")
 
     selected_assistants = []
     for choice in assistant_choices.split():
         resolved = resolve_agent_name(choice)
         if resolved is None:
-            console.print(f"[yellow]Warning: Invalid assistant '{choice}' ignored[/yellow]")
+            console.print(
+                f"[yellow]Warning: Invalid assistant '{choice}' ignored[/yellow]"
+            )
         else:
             selected_assistants.append(resolved)
 
@@ -192,9 +196,7 @@ def _prompt_for_language():
     """Prompt for language selection."""
     console.print("\n[yellow]No language specified[/yellow]")
     language_choice = Prompt.ask(
-        "Select language",
-        choices=[lang.value for lang in Language],
-        default="python"
+        "Select language", choices=[lang.value for lang in Language], default="python"
     )
     return Language(language_choice)
 
@@ -204,15 +206,16 @@ def _prompt_for_assistants():
     console.print("\n[yellow]No assistants specified[/yellow]")
     console.print(f"[dim]Available: {', '.join(get_available_agent_names())}[/dim]")
     assistant_choices = Prompt.ask(
-        "Select assistants (space-separated)",
-        default="claude"
+        "Select assistants (space-separated)", default="claude"
     )
 
     selected = []
     for choice in assistant_choices.split():
         resolved = resolve_agent_name(choice)
         if resolved is None:
-            console.print(f"[yellow]Warning: Invalid assistant '{choice}' ignored[/yellow]")
+            console.print(
+                f"[yellow]Warning: Invalid assistant '{choice}' ignored[/yellow]"
+            )
         else:
             selected.append(resolved)
 
@@ -243,4 +246,6 @@ def _show_detailed_results(result):
         if op.success:
             console.print(f"  [green]✓[/green] {op.relative_destination}")
         else:
-            console.print(f"  [red]✗[/red] {op.relative_destination}: {op.error_message}")
+            console.print(
+                f"  [red]✗[/red] {op.relative_destination}: {op.error_message}"
+            )

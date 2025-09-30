@@ -1,20 +1,26 @@
 """File operations and template management."""
 
-import shutil
 import logging
-from pathlib import Path
-from typing import List, Optional, Tuple
-from contextlib import contextmanager
+import shutil
 import time
+from collections.abc import Callable
+from contextlib import contextmanager
+from pathlib import Path
 
-from rapid_tui.models import (
-    Assistant, Language, CopyOperation,
-    InitializationResult, AssistantConfig
-)
 from rapid_tui.config import (
-    get_assistant_config, get_agents_template_dir,
-    get_commands_template_dir, get_language_templates,
-    COPY_BUFFER_SIZE, MAX_RETRY_ATTEMPTS, RETRY_DELAY
+    MAX_RETRY_ATTEMPTS,
+    RETRY_DELAY,
+    get_agents_template_dir,
+    get_assistant_config,
+    get_commands_template_dir,
+    get_language_templates,
+)
+from rapid_tui.models import (
+    Assistant,
+    AssistantConfig,
+    CopyOperation,
+    InitializationResult,
+    Language,
 )
 
 
@@ -31,8 +37,8 @@ class TemplateManager:
         """
         self.project_root = project_root
         self.dry_run = dry_run
-        self.operations: List[CopyOperation] = []
-        self.created_directories: List[Path] = []
+        self.operations: list[CopyOperation] = []
+        self.created_directories: list[Path] = []
         self.logger = self._setup_logger()
 
     def _setup_logger(self) -> logging.Logger:
@@ -44,13 +50,8 @@ class TemplateManager:
             if not rapid_dir.exists():
                 rapid_dir.mkdir(parents=True, exist_ok=True)
 
-            handler = logging.FileHandler(
-                rapid_dir / "initialization.log",
-                mode='a'
-            )
-            formatter = logging.Formatter(
-                '%(asctime)s - %(levelname)s - %(message)s'
-            )
+            handler = logging.FileHandler(rapid_dir / "initialization.log", mode="a")
+            formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
             handler.setFormatter(formatter)
             logger.addHandler(handler)
             logger.setLevel(logging.INFO)
@@ -59,8 +60,8 @@ class TemplateManager:
     def initialize_project(
         self,
         language: Language,
-        assistants: List[Assistant],
-        progress_callback: Optional[callable] = None
+        assistants: list[Assistant],
+        progress_callback: Callable | None = None,
     ) -> InitializationResult:
         """
         Initialize project with selected templates.
@@ -73,13 +74,15 @@ class TemplateManager:
         Returns:
             InitializationResult with operation details
         """
-        self.logger.info(f"Starting initialization for {language.value} with {[a.value for a in assistants]}")
+        self.logger.info(
+            f"Starting initialization for {language.value} with {[a.value for a in assistants]}"
+        )
 
         result = InitializationResult(
             success=True,
             operations=[],
             total_files_copied=0,
-            total_directories_created=0
+            total_directories_created=0,
         )
 
         try:
@@ -90,24 +93,32 @@ class TemplateManager:
             total_steps = len(assistants)
             for idx, assistant in enumerate(assistants):
                 if progress_callback:
-                    progress_callback(f"Configuring {assistant.display_name}", idx, total_steps)
+                    progress_callback(
+                        f"Configuring {assistant.display_name}", idx, total_steps
+                    )
 
                 ops = self.copy_for_assistant(assistant, language)
                 result.operations.extend(ops)
 
             # Calculate totals
-            result.total_files_copied = len([op for op in result.operations if op.success])
+            result.total_files_copied = len(
+                [op for op in result.operations if op.success]
+            )
             result.total_directories_created = len(self.created_directories)
 
             # Check for any failures
             failed_ops = [op for op in result.operations if not op.success]
             if failed_ops:
                 result.success = False
-                result.errors = [op.error_message for op in failed_ops if op.error_message]
+                result.errors = [
+                    op.error_message for op in failed_ops if op.error_message
+                ]
 
             # Add warnings for See-Sharp if selected
             if language == Language.SEE_SHARP:
-                result.warnings.append("C# templates are not yet available. Commands have been copied, but agent templates are pending.")
+                result.warnings.append(
+                    "C# templates are not yet available. Commands have been copied, but agent templates are pending."
+                )
 
             if progress_callback:
                 progress_callback("Initialization complete", total_steps, total_steps)
@@ -122,10 +133,8 @@ class TemplateManager:
         return result
 
     def copy_for_assistant(
-        self,
-        assistant: Assistant,
-        language: Language
-    ) -> List[CopyOperation]:
+        self, assistant: Assistant, language: Language
+    ) -> list[CopyOperation]:
         """
         Copy files according to assistant-specific structure.
 
@@ -161,11 +170,8 @@ class TemplateManager:
         return operations
 
     def _copy_agents(
-        self,
-        config: AssistantConfig,
-        language: Language,
-        assistant: Assistant
-    ) -> List[CopyOperation]:
+        self, config: AssistantConfig, language: Language, assistant: Assistant
+    ) -> list[CopyOperation]:
         """Copy agent templates to assistant directory."""
         operations = []
 
@@ -187,18 +193,14 @@ class TemplateManager:
             source = source_dir / filename
             destination = target_dir / filename
 
-            operation = self._copy_file(
-                source, destination, "agent", assistant
-            )
+            operation = self._copy_file(source, destination, "agent", assistant)
             operations.append(operation)
 
         return operations
 
     def _copy_commands(
-        self,
-        config: AssistantConfig,
-        assistant: Assistant
-    ) -> List[CopyOperation]:
+        self, config: AssistantConfig, assistant: Assistant
+    ) -> list[CopyOperation]:
         """Copy command templates to assistant directory.
 
         For GitHub Copilot, copies from templates/prompts to both .rapid/prompts and .github/prompts.
@@ -209,6 +211,7 @@ class TemplateManager:
         # Determine source directory based on assistant
         if assistant == Assistant.GITHUB_COPILOT:
             from rapid_tui.config import get_prompts_template_dir
+
             source_dir = get_prompts_template_dir()
             rapid_subdir = "prompts"
         else:
@@ -236,9 +239,7 @@ class TemplateManager:
         for source_file in command_files:
             destination = target_dir / source_file.name
 
-            operation = self._copy_file(
-                source_file, destination, "command", assistant
-            )
+            operation = self._copy_file(source_file, destination, "command", assistant)
             operations.append(operation)
 
         return operations
@@ -248,7 +249,7 @@ class TemplateManager:
         config: AssistantConfig,
         language: Language,
         assistant: Assistant,
-    ) -> List[CopyOperation]:
+    ) -> list[CopyOperation]:
         """Copy instruction template to .rapid/instructions/ and assistant directory.
 
         Args:
@@ -331,7 +332,7 @@ class TemplateManager:
         source: Path,
         destination: Path,
         operation_type: str,
-        assistant: Optional[Assistant] = None
+        assistant: Assistant | None = None,
     ) -> CopyOperation:
         """
         Copy a single file with retry logic.
@@ -349,7 +350,7 @@ class TemplateManager:
             source=source,
             destination=destination,
             operation_type=operation_type,
-            assistant=assistant
+            assistant=assistant,
         )
 
         if self.dry_run:
@@ -381,7 +382,9 @@ class TemplateManager:
                     self.logger.warning(f"Attempt {attempt + 1} failed, retrying: {e}")
                     time.sleep(RETRY_DELAY)
                 else:
-                    self.logger.error(f"Failed to copy after {MAX_RETRY_ATTEMPTS} attempts: {e}")
+                    self.logger.error(
+                        f"Failed to copy after {MAX_RETRY_ATTEMPTS} attempts: {e}"
+                    )
 
         self.operations.append(operation)
         return operation
@@ -417,7 +420,9 @@ class TemplateManager:
                     operation.destination.unlink()
                     self.logger.info(f"Rolled back file: {operation.destination}")
                 except Exception as e:
-                    self.logger.error(f"Failed to rollback {operation.destination}: {e}")
+                    self.logger.error(
+                        f"Failed to rollback {operation.destination}: {e}"
+                    )
 
         # Remove created directories (in reverse order)
         for directory in reversed(self.created_directories):
@@ -428,7 +433,7 @@ class TemplateManager:
             except Exception as e:
                 self.logger.error(f"Failed to remove directory {directory}: {e}")
 
-    def validate_environment(self) -> Tuple[bool, List[str]]:
+    def validate_environment(self) -> tuple[bool, list[str]]:
         """
         Validate the environment before operations.
 

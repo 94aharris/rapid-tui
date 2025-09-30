@@ -1,22 +1,16 @@
 """Test helper functions and mock patterns for RAPID TUI tests."""
 
-from pathlib import Path
-from typing import List
 from unittest.mock import Mock
 
 from rapid_tui.models import (
     InitializationResult,
-    Assistant,
-    Language,
 )
-
-
 
 
 def create_mock_initialization_result(
     success: bool = True,
     files_copied: int = 3,
-    errors: List[str] = None,
+    errors: list[str] = None,
 ) -> InitializationResult:
     """Create mock InitializationResult for testing."""
     return InitializationResult(
@@ -27,8 +21,6 @@ def create_mock_initialization_result(
         errors=errors or ([] if success else ["Mock error"]),
         warnings=[],
     )
-
-
 
 
 class MockTemplateManager:

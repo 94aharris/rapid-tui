@@ -3,13 +3,11 @@
 This module focuses on core business logic and integration with TemplateManager.
 """
 
-import pytest
-from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
+from rapid_tui.models import Assistant, Language
 from rapid_tui.services.initialization import InitializationService
-from rapid_tui.models import Language, Assistant, InitializationResult
-from tests.test_helpers import MockTemplateManager, create_mock_initialization_result
+from tests.test_helpers import MockTemplateManager
 
 
 class TestInitializationService:

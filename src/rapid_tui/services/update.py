@@ -3,13 +3,12 @@
 import logging
 import shutil
 from pathlib import Path
-from typing import List, Optional
 
 from rich.console import Console
 from rich.table import Table
 
-from rapid_tui.models import Assistant, FileOperation, UpdateResult
 from rapid_tui.config import ASSISTANT_CONFIGS
+from rapid_tui.models import Assistant, FileOperation, UpdateResult
 
 
 class UpdateService:
@@ -24,7 +23,7 @@ class UpdateService:
         self.console = Console()
         self.logger = logging.getLogger(__name__)
 
-    def _detect_language_from_instructions(self) -> Optional[str]:
+    def _detect_language_from_instructions(self) -> str | None:
         """Detect project language by scanning .rapid/instructions/ directory.
 
         Returns:
@@ -162,9 +161,7 @@ class UpdateService:
                             f"Failed to sync instructions: {instruction_op.reason}"
                         )
                     else:
-                        self.logger.info(
-                            f"Synced instruction file to {target_file}"
-                        )
+                        self.logger.info(f"Synced instruction file to {target_file}")
                 elif not source_file.exists():
                     self.logger.warning(
                         f"Instruction source file not found: {source_file}"
@@ -185,7 +182,7 @@ class UpdateService:
 
     def _sync_directory_structure(
         self, source_dir: Path, target_dir: Path, force: bool
-    ) -> tuple[List[FileOperation], List[str]]:
+    ) -> tuple[list[FileOperation], list[str]]:
         """Recursively sync directory structure preserving nested paths."""
         operations = []
         errors = []
@@ -275,7 +272,7 @@ class UpdateService:
             return False
 
         try:
-            with open(file1, 'rb') as f1, open(file2, 'rb') as f2:
+            with open(file1, "rb") as f1, open(file2, "rb") as f2:
                 return f1.read() == f2.read()
         except Exception as e:
             self.logger.error(f"Error comparing files: {e}")
@@ -467,7 +464,10 @@ class UpdateService:
                     if assistant != Assistant.RAPID_ONLY:
                         # Check if other assistants have modified instruction files
                         for other_assistant, other_config in ASSISTANT_CONFIGS.items():
-                            if other_assistant == assistant or other_assistant == Assistant.RAPID_ONLY:
+                            if (
+                                other_assistant == assistant
+                                or other_assistant == Assistant.RAPID_ONLY
+                            ):
                                 continue
                             if not other_config.copy_instructions:
                                 continue

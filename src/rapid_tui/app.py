@@ -1,17 +1,17 @@
 """Main RAPID TUI application."""
 
-from textual.app import App, ComposeResult
+import logging
+import sys
+from pathlib import Path
+
+from textual.app import App
 from textual.binding import Binding
 from textual.screen import Screen
-from typing import Optional, List, Dict, Type
-from pathlib import Path
-import sys
-import logging
 
-from rapid_tui.models import Language, Assistant, InitializationConfig
-from rapid_tui.screens.language_select import LanguageSelectScreen
+from rapid_tui.models import Assistant, InitializationConfig, Language
 from rapid_tui.screens.assistant_select import AssistantSelectScreen
 from rapid_tui.screens.confirmation import ConfirmationScreen
+from rapid_tui.screens.language_select import LanguageSelectScreen
 
 
 class RapidTUI(App):
@@ -30,7 +30,7 @@ class RapidTUI(App):
         """Initialize the RAPID TUI application."""
         super().__init__()
         self.config = InitializationConfig()
-        self.screens: Dict[str, Type[Screen]] = {}
+        self.screens: dict[str, type[Screen]] = {}
         self._setup_logging()
 
     def _setup_logging(self) -> None:
@@ -40,11 +40,11 @@ class RapidTUI(App):
 
         logging.basicConfig(
             level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             handlers=[
                 logging.FileHandler(log_dir / "rapid_tui.log"),
-                logging.StreamHandler()
-            ]
+                logging.StreamHandler(),
+            ],
         )
 
         self.logger = logging.getLogger(__name__)
@@ -91,7 +91,7 @@ class RapidTUI(App):
         assistant_screen = AssistantSelectScreen(language)
         self.push_screen(assistant_screen)
 
-    def handle_assistant_selection(self, assistants: List[Assistant]) -> None:
+    def handle_assistant_selection(self, assistants: list[Assistant]) -> None:
         """
         Handle assistant selection from assistant screen.
 
@@ -131,7 +131,6 @@ class RapidTUI(App):
 
 def main():
     """Universal entry point that delegates to CLI or TUI."""
-    import sys
 
     # Check if --ui flag is present (hidden but still functional)
     if "--ui" in sys.argv:
@@ -153,6 +152,7 @@ def main():
     else:
         # Launch CLI mode (default)
         from rapid_tui.cli.main import cli
+
         cli()
 
 
