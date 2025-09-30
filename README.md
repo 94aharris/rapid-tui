@@ -196,3 +196,120 @@ The Develop phase executes the approved implementation plan using a specialized 
 4. Ensure code compiles/runs without errors, follows language-specific type requirements, and integrates properly with existing dependencies
 5. Verify that the implementation maintains backward compatibility and follows existing architectural patterns
 6. Confirm completion of all planned implementation tasks with the user, providing summary of modified/created files and key changes implemented
+
+## Appendix: Complete RAPID Workflow Example
+
+Here's a full example of using RAPID with Claude Code to implement a new feature:
+
+### 1. Initialize RAPID in Your Repository
+
+```bash
+# Navigate to your project
+cd /path/to/your/project
+
+# Initialize RAPID for a Python project with Claude Code
+rapid init --language python --assistant claude-code
+
+# Verify initialization
+rapid status
+```
+
+### 2. Start Feature Development
+
+```bash
+# In Claude Code, start with the init phase
+/rapid-init
+
+# Provide your feature request when prompted:
+# "Add user authentication with JWT tokens including login, logout, and token refresh endpoints"
+# This creates a new git worktree and research prompt
+```
+
+```bash
+# Change to the appropriate worktree
+cd <worktree_path>
+```
+
+### 3. Research the Codebase
+
+```bash
+# Research existing patterns and gather context
+/rapid-research
+
+# The agent will analyze your codebase for:
+# - Existing authentication patterns
+# - Database models and schemas
+# - API endpoint conventions
+# - Dependency management
+# Output saved to .rapid/branch-name/research.md
+```
+
+### 4. Align on Requirements
+
+```bash
+# Resolve any questions and clarify requirements
+/rapid-align
+
+# Answer clarifying questions like:
+# - "Should we use Redis for token blacklisting?"
+# - "What should the token expiration time be?"
+# - "Do you need role-based access control?"
+```
+
+### 5. Generate Technical Plan
+
+```bash
+# Create detailed implementation plan
+/rapid-plan
+
+# The planning agent generates:
+# - API endpoint specifications
+# - Database schema changes
+# - Authentication flow diagrams
+# - Integration points
+# Output saved to .rapid/branch-name/plan.md
+```
+
+### 6. Review and Inspect Plan
+
+```bash
+# Review the generated plan before implementation
+/rapid-inspect
+
+# Review the plan and provide feedback:
+# - Confirm API endpoint paths
+# - Validate security considerations
+# - Approve database changes
+```
+
+### 7. Implement the Feature
+
+```bash
+# Execute the approved plan
+/rapid-develop
+
+# The development agent will:
+# - Create authentication middleware
+# - Implement JWT token generation/validation
+# - Add login/logout endpoints
+# - Set up token refresh mechanism
+# - Write necessary tests
+```
+
+### 8. Complete the Workflow
+
+After development, you can:
+
+- Review the implemented changes
+- Run tests to verify functionality
+- Commit changes to your feature branch
+- Create a pull request for review
+
+### Tips for Claude Code Users
+
+1. **Keep context focused**: RAPID manages context automatically between phases
+2. **Trust the process**: Let each phase complete before moving to the next
+3. **Review outputs**: Check the `.rapid/branch-name/` files to understand what's being passed between phases
+4. **Iterate if needed**: You can re-run any phase if adjustments are needed
+
+This structured approach ensures consistent, high-quality implementations that align with your codebase patterns and requirements.
